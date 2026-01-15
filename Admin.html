@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>考試成績管理後台</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: '微軟正黑體', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      padding: 40px;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #667eea;
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+    
+    .info {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .login-container {
+      max-width: 400px;
+      margin: 50px auto;
+      text-align: center;
+    }
+    
+    .login-box {
+      background: #f9f9f9;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .login-box h2 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 22px;
+    }
+    
+    .input-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      text-align: left;
+    }
+    
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .btn {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+      width: 100%;
+    }
+    
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-logout {
+      background: #f44336;
+      color: white;
+      padding: 8px 20px;
+      font-size: 14px;
+    }
+    
+    .btn-logout:hover {
+      background: #d32f2f;
+    }
+    
+    .error {
+      color: #f44336;
+      padding: 10px;
+      background: #ffebee;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      display: none;
+      font-size: 14px;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .toolbar h2 {
+      color: #333;
+      font-size: 20px;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    
+    thead {
+      background: #f5f5f5;
+    }
+    
+    th {
+      padding: 12px;
+      text-align: left;
+      color: #333;
+      font-weight: 600;
+      border-bottom: 2px solid #667eea;
+    }
+    
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      color: #555;
+    }
+    
+    tbody tr:hover {
+      background: #f9f9f9;
+    }
+    
+    .score-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-weight: 500;
+      font-size: 13px;
+    }
+    
+    .score-high {
+      background: #4caf50;
+      color: white;
+    }
+    
+    .score-medium {
+      background: #ff9800;
+      color: white;
+    }
+    
+    .score-low {
+      background: #f44336;
+      color: white;
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      color: #667eea;
+      margin: 40px 0;
+    }
+    
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+      font-size: 16px;
+      display: none;
+    }
+    
+    #resultsSection {
+      display: none;
+    }
+    
+    .answers-cell {
+      max-width: 300px;
+      white-space: normal;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 登入頁面 -->
+    <div id="loginSection">
+      <div class="login-container">
+        <div class="login-box">
+          <h2>🔐 管理員登入</h2>
+          <div class="error" id="loginError"></div>
+          <form id="loginForm">
+            <div class="input-group">
+              <label for="password">管理員密碼：</label>
+              <input type="password" id="password" placeholder="請輸入密碼" required />
+            </div>
+            <button type="submit" class="btn btn-primary">登入</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 成績管理頁面 -->
+    <div id="resultsSection">
+      <div class="header">
+        <h1>📊 考試成績管理後台</h1>
+        <p class="info">查看所有考生的考試成績</p>
+      </div>
+      
+      <div class="stats" id="statsContainer"></div>
+      
+      <div class="toolbar">
+        <h2>考生成績列表</h2>
+        <button class="btn btn-logout" onclick="logout()">登出</button>
+      </div>
+      
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div>載入中...</div>
+      </div>
+      
+      <div class="no-data" id="noData">
+        <p>📭 目前沒有任何考試記錄</p>
+      </div>
+      
+      <div class="table-container">
+        <table id="resultsTable">
+          <thead>
+            <tr>
+              <th>序號</th>
+              <th>姓名</th>
+              <th>分數</th>
+              <th>考試時間</th>
+              <th>詳細答案</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ========== 設定 Google Apps Script API URL ==========
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbz-oHS4wMPAJd1BAQSLCb2qaI4grUD6EtU9HVsnQthdVA43_i52MBWX0IYPDVFu-Ss0BA/exec';
+    
+    // 頁面載入時設定
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('loginForm').addEventListener('submit', handleLogin);
+    });
+    
+    // 處理登入
+    async function handleLogin(e) {
+      e.preventDefault();
+      
+      const password = document.getElementById('password').value;
+      document.getElementById('loginError').style.display = 'none';
+      
+      try {
+        const response = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({
+            action: 'getResults',
+            password: password
+          })
+        });
+        
+        const text = await response.text();
+        const result = JSON.parse(text);
+        
+        if (result.success) {
+          showResults(result.data);
+        } else {
+          showLoginError(result.message);
+        }
+      } catch (error) {
+        showLoginError('連線錯誤：' + error.message);
+      }
+    }
+    
+    // 顯示登入錯誤
+    function showLoginError(msg) {
+      const errorDiv = document.getElementById('loginError');
+      errorDiv.textContent = msg;
+      errorDiv.style.display = 'block';
+    }
+    
+    // 顯示成績頁面
+    function showResults(data) {
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('resultsSection').style.display = 'block';
+      
+      if (data.length === 0) {
+        document.getElementById('noData').style.display = 'block';
+        return;
+      }
+      
+      renderStats(data);
+      renderTable(data);
+    }
+    
+    // 渲染統計卡片
+    function renderStats(data) {
+      const totalExams = data.length;
+      const totalScore = data.reduce((sum, item) => sum + item.score, 0);
+      const avgScore = totalScore / totalExams;
+      const maxScore = Math.max(...data.map(item => item.score));
+      
+      const statsHtml = `
+        <div class="stat-card">
+          <div class="stat-value">${totalExams}</div>
+          <div class="stat-label">總考生數</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${avgScore.toFixed(1)}</div>
+          <div class="stat-label">平均分數</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${maxScore}</div>
+          <div class="stat-label">最高分數</div>
+        </div>
+      `;
+      
+      document.getElementById('statsContainer').innerHTML = statsHtml;
+    }
+    
+    // 渲染成績表格
+    function renderTable(data) {
+      const tbody = document.getElementById('resultsBody');
+      tbody.innerHTML = '';
+      
+      // 按時間倒序排列（最新的在最上面）
+      const sortedData = [...data].reverse();
+      
+      sortedData.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        
+        let scoreClass = 'score-low';
+        if (item.score >= 80) scoreClass = 'score-high';
+        else if (item.score >= 60) scoreClass = 'score-medium';
+        
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td><strong>${escapeHtml(item.name)}</strong></td>
+          <td><span class="score-badge ${scoreClass}">${item.score} 分</span></td>
+          <td>${escapeHtml(item.timestamp)}</td>
+          <td class="answers-cell">${escapeHtml(item.answers)}</td>
+        `;
+        
+        tbody.appendChild(tr);
+      });
+    }
+    
+    // 登出
+    function logout() {
+      document.getElementById('resultsSection').style.display = 'none';
+      document.getElementById('loginSection').style.display = 'block';
+      document.getElementById('password').value = '';
+      document.getElementById('loginError').style.display = 'none';
+    }
+    
+    // HTML 轉義
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

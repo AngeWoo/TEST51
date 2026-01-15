@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>人資面試考試系統</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: '微軟正黑體', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      padding: 40px;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+    
+    .info {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .user-info {
+      margin-bottom: 30px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+    }
+    
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .question-block {
+      margin-bottom: 25px;
+      padding: 20px;
+      background: #f9f9f9;
+      border-left: 4px solid #667eea;
+      border-radius: 4px;
+    }
+    
+    .question-title {
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #333;
+      font-size: 16px;
+    }
+    
+    .question-num {
+      color: #667eea;
+      font-size: 12px;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+    
+    .options label {
+      display: block;
+      margin: 10px 0;
+      padding: 8px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    
+    .options label:hover {
+      background: #eee;
+    }
+    
+    input[type="radio"] {
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+    
+    button {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    
+    .btn-submit {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-submit:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-reset {
+      background: #ddd;
+      color: #333;
+    }
+    
+    .btn-reset:hover {
+      background: #ccc;
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      color: #667eea;
+      margin: 20px 0;
+    }
+    
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .result {
+      display: none;
+      margin-top: 30px;
+      padding: 25px;
+      background: #f0f9ff;
+      border: 2px solid #667eea;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .result-score {
+      font-size: 48px;
+      font-weight: bold;
+      color: #667eea;
+      margin: 20px 0;
+    }
+    
+    .result-info {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    
+    .result-detail {
+      margin-top: 15px;
+      text-align: left;
+    }
+    
+    .result-item {
+      padding: 10px;
+      margin: 8px 0;
+      background: white;
+      border-radius: 4px;
+      font-size: 13px;
+      border-left: 4px solid;
+    }
+    
+    .correct {
+      border-left-color: #4caf50;
+    }
+    
+    .incorrect {
+      border-left-color: #f44336;
+    }
+    
+    .error {
+      color: #f44336;
+      padding: 15px;
+      background: #ffebee;
+      border-radius: 4px;
+      margin: 15px 0;
+      display: none;
+    }
+    
+    .admin-link {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: all 0.3s;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .admin-link:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .container {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <a href="?page=admin" class="admin-link">🔐 管理後台</a>
+  <div class="container">
+    <div class="header">
+      <h1>📋 人資面試考試</h1>
+      <p class="info">5道選擇題，每題20分</p>
+    </div>
+    
+    <div class="user-info">
+      <label for="userName">姓名：</label>
+      <input type="text" id="userName" placeholder="請輸入姓名" />
+    </div>
+    
+    <form id="examForm">
+      <div id="questionsContainer"></div>
+      
+      <div class="button-group">
+        <button type="submit" class="btn-submit">提交答案</button>
+        <button type="reset" class="btn-reset">重新填寫</button>
+      </div>
+    </form>
+    
+    <div class="loading">
+      <span class="spinner"></span>
+      <span>批改中...</span>
+    </div>
+    
+    <div class="result">
+      <h2>📊 考試結果</h2>
+      <div class="result-score" id="finalScore"></div>
+      <div class="result-info" id="scoreInfo"></div>
+      <div class="result-detail" id="resultDetail"></div>
+    </div>
+    
+    <div class="error" id="errorMsg"></div>
+  </div>
+
+  <script>
+    // ========== 設定 Google Apps Script API URL ==========
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbz-oHS4wMPAJd1BAQSLCb2qaI4grUD6EtU9HVsnQthdVA43_i52MBWX0IYPDVFu-Ss0BA/exec';
+    
+    // 頁面載入時取得題目
+    document.addEventListener('DOMContentLoaded', () => {
+      loadQuestions();
+      document.getElementById('examForm').addEventListener('submit', handleSubmit);
+    });
+    
+    // 取得題目
+    async function loadQuestions() {
+      try {
+        const response = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({
+            action: 'getQuestions'
+          })
+        });
+        
+        const text = await response.text();
+        const result = JSON.parse(text);
+        
+        if (result.success) {
+          renderQuestions(result.data);
+        } else {
+          showError('載入題目失敗：' + result.message);
+        }
+      } catch (error) {
+        showError('連線錯誤：' + error.message);
+      }
+    }
+    
+    // 顯示題目
+    function renderQuestions(questions) {
+      const container = document.getElementById('questionsContainer');
+      container.innerHTML = '';
+      
+      questions.forEach((q, index) => {
+        const block = document.createElement('div');
+        block.className = 'question-block';
+        
+        let html = `
+          <div class="question-num">第 ${index + 1} 題</div>
+          <div class="question-title">${escapeHtml(q.question)}</div>
+          <div class="options">
+        `;
+        
+        q.options.forEach((option) => {
+          html += `
+            <label>
+              <input type="radio" name="q${q.id}" value="${option}" required />
+              ${escapeHtml(option)}
+            </label>
+          `;
+        });
+        
+        html += '</div>';
+        block.innerHTML = html;
+        container.appendChild(block);
+      });
+    }
+    
+    // 提交答案
+    async function handleSubmit(e) {
+      e.preventDefault();
+      
+      const userName = document.getElementById('userName').value.trim();
+      if (!userName) {
+        showError('請輸入姓名');
+        return;
+      }
+      
+      // 收集答案
+      const answers = {};
+      const formData = new FormData(document.getElementById('examForm'));
+      for (const [key, value] of formData.entries()) {
+        answers[key] = value;
+      }
+      
+      // 顯示載入中
+      document.querySelector('.loading').style.display = 'block';
+      document.querySelector('.result').style.display = 'none';
+      document.getElementById('errorMsg').style.display = 'none';
+      
+      try {
+        const response = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({
+            action: 'submitAnswers',
+            answers: JSON.stringify(answers),
+            userName: userName
+          })
+        });
+        
+        const text = await response.text();
+        const result = JSON.parse(text);
+        
+        document.querySelector('.loading').style.display = 'none';
+        
+        if (result.success) {
+          displayResult(result);
+        } else {
+          showError('批改失敗：' + result.message);
+        }
+      } catch (error) {
+        document.querySelector('.loading').style.display = 'none';
+        showError('提交失敗：' + error.message);
+      }
+    }
+    
+    // 顯示結果
+    function displayResult(result) {
+      const correctCount = result.details.filter(d => d.earned === d.total).length;
+      document.getElementById('finalScore').textContent = result.score;
+      document.getElementById('scoreInfo').textContent = `答對 ${correctCount}/5 題`;
+      
+      document.getElementById('resultDetail').innerHTML = result.details.map((d, idx) => {
+        const isCorrect = d.earned === d.total;
+        return `
+          <div class="result-item ${isCorrect ? 'correct' : 'incorrect'}">
+            第 ${idx + 1} 題：<strong>${d.earned}/${d.total} 分</strong>
+            ${!isCorrect ? `
+              <br/><small>您的答案：${escapeHtml(d.userAnswer)}</small>
+              <br/><small style="color: #4caf50;">正確答案：${escapeHtml(d.correctAnswer)}</small>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+      
+      document.querySelector('.result').style.display = 'block';
+      window.scrollTo(0, 0);
+    }
+    
+    // 顯示錯誤訊息
+    function showError(msg) {
+      const errorDiv = document.getElementById('errorMsg');
+      errorDiv.textContent = msg;
+      errorDiv.style.display = 'block';
+    }
+    
+    // HTML 轉義
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
