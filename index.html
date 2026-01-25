@@ -3,71 +3,135 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>人才招募系統 | Career Application</title>
+  <title>人才招募申請中心 | Career Application</title>
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
   <style>
-    :root { --primary: #1a365d; --accent: #2b6cb0; --bg: #f7fafc; --text: #2d3748; }
-    body { font-family: "Noto Sans TC", sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--text); line-height: 1.5; }
-    
-    .container { max-width: 900px; margin: 10px auto; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
-    
-    /* Header 樣式 */
-    .header { background: var(--primary); color: white; padding: 40px 20px; text-align: center; position: relative; }
-    .header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; word-break: keep-all; }
-    
-    /* 管理後台按鈕 */
-    .admin-btn { 
-      position: absolute; top: 10px; right: 10px; 
-      color: rgba(255,255,255,0.8); font-size: 11px; text-decoration: none; 
-      border: 1px solid rgba(255,255,255,0.4); padding: 4px 10px; border-radius: 20px;
-      transition: all 0.3s;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap');
+
+    :root { 
+      --primary: #991b1b; /* 深企業紅 */
+      --accent: #ef4444;  /* 緋紅 */
+      --bg: #fdf2f2;      
+      --card-border: #fee2e2;
+      --shadow-3d: 0 10px 25px -5px rgba(153, 27, 27, 0.15);
+      --btn-inset: inset 0 -4px 0 rgba(0,0,0,0.2);
     }
 
-    .content { padding: 30px; }
-    
-    /* 步驟指示器 */
-    .stepper { display: flex; justify-content: space-between; padding: 15px 20px; background: #fff; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
-    .step-idx { color: #cbd5e0; font-weight: bold; }
-    .step-idx.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+    body { 
+      font-family: 'Inter', 'Noto Sans TC', sans-serif; 
+      background: var(--bg); 
+      margin: 0; 
+      padding: 40px 15px; 
+      color: #1e293b; 
+      font-size: 18px; 
+      line-height: 1.6;
+    }
 
-    .step { display: none; animation: fadeIn 0.4s ease; }
+    .container { 
+      max-width: 900px; 
+      margin: 0 auto; 
+      background: white; 
+      border-radius: 30px; 
+      box-shadow: 0 30px 60px -12px rgba(153, 27, 27, 0.15); 
+      overflow: hidden; 
+      position: relative; 
+      border: 1px solid var(--card-border);
+    }
+    
+    .header { 
+      background: linear-gradient(135deg, #ef4444, #991b1b); 
+      color: white; 
+      padding: 50px 30px; 
+      text-align: center; 
+      position: relative; 
+      border-bottom: 6px solid rgba(0,0,0,0.1);
+    }
+    .header h1 { margin: 0; font-size: 34px; font-weight: 900; letter-spacing: 1px; }
+    
+    .admin-btn { 
+      position: absolute; top: 15px; right: 15px; 
+      color: white; font-size: 13px; text-decoration: none; 
+      border: 1px solid rgba(255,255,255,0.4); padding: 6px 14px; border-radius: 20px;
+      transition: 0.3s; background: rgba(255,255,255,0.1); font-weight: bold;
+    }
+
+    .content { padding: 40px; }
+    
+    .stepper { 
+      display: flex; justify-content: space-between; padding: 20px 30px; 
+      background: #fffafa; border-bottom: 2px solid var(--card-border); 
+      font-size: 16px; font-weight: 900; color: #94a3b8;
+    }
+    .step-idx.active { color: var(--primary); border-bottom: 3px solid var(--primary); padding-bottom: 5px; }
+
+    .step { display: none; animation: fadeIn 0.5s ease; }
     .step.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; } }
 
-    /* 表單佈局 */
-    .section-title { font-size: 18px; color: var(--primary); border-left: 4px solid var(--accent); padding-left: 10px; margin: 25px 0 15px; grid-column: span 2; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .section-title { 
+      font-size: 24px; color: var(--primary); font-weight: 900; 
+      border-left: 6px solid var(--accent); padding-left: 15px; 
+      margin: 40px 0 25px; grid-column: span 2; 
+    }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
     .full { grid-column: span 2; }
-    label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
-    input, select, textarea { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; font-size: 16px; transition: border-color 0.2s; }
-    input:focus { border-color: var(--accent); outline: none; }
     
-    /* 簽名版樣式 */
-    .canvas-container { width: 100%; background: #fdfdfd; border: 1px dashed #cbd5e0; border-radius: 8px; margin: 15px 0; touch-action: none; }
-    canvas { width: 100%; height: 200px; cursor: crosshair; display: block; }
+    label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 16px; color: #475569; }
+    
+    input, select, textarea { 
+      width: 100%; padding: 16px; border: 2px solid #e2e8f0; border-radius: 15px; 
+      box-sizing: border-box; font-size: 18px; transition: 0.3s; background: #fff;
+    }
+    input:focus, select:focus, textarea:focus { 
+      border-color: var(--accent); outline: none; box-shadow: 0 0 0 5px rgba(239, 68, 68, 0.1); 
+    }
 
-    /* 測驗題目樣式 */
-    .q-card { background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
-    .opt-label { display: flex; align-items: center; justify-content: flex-start; padding: 12px 15px; margin: 8px 0; background: white; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; }
-    .opt-label input { width: auto; margin: 0 15px 0 0; }
+    /* --- 多行輸入框縮放優化 --- */
+    textarea { 
+      resize: vertical; /* 允許垂直方向手動拉大 */
+      min-height: 100px;
+      font-family: inherit;
+    }
+    
+    .btn-next { 
+      background: var(--accent); color: white; border: none; padding: 20px; 
+      border-radius: 18px; font-weight: 900; cursor: pointer; width: 100%; 
+      font-size: 22px; margin-top: 25px; transition: 0.1s;
+      box-shadow: 0 6px 0 #b91c1c, 0 10px 20px rgba(153, 27, 27, 0.2);
+    }
+    .btn-next:active { transform: translateY(4px); box-shadow: 0 2px 0 #b91c1c; }
 
-    .btn-next { background: var(--accent); color: white; border: none; padding: 16px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 18px; margin-top: 15px; }
+    .btn-clear { 
+      flex: 1; padding: 15px; border-radius: 15px; border: 2px solid #e2e8f0; 
+      background: white; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.2s;
+    }
 
-    /* --- 手機版優化 (Mobile Optimization) --- */
-    @media (max-width: 600px) {
-      .header { padding: 30px 15px; }
-      .header h1 { font-size: 22px; }
-      .content { padding: 20px 15px; }
-      
-      /* 核心修復：手機端由雙欄改為單欄，避免重疊 */
+    .canvas-container { 
+      width: 100%; background: #fdfdfd; border: 3px dashed var(--card-border); 
+      border-radius: 20px; margin: 20px 0; touch-action: none; 
+    }
+    canvas { width: 100%; height: 250px; cursor: crosshair; display: block; }
+
+    .q-card { 
+      background: #fffafa; padding: 30px; border-radius: 20px; 
+      margin-bottom: 25px; border: 1px solid var(--card-border);
+      box-shadow: var(--shadow-3d);
+    }
+    .q-card p { font-weight: 900; font-size: 20px; color: var(--primary); margin-top: 0; }
+    
+    .opt-label { 
+      display: flex; align-items: center; justify-content: flex-start; 
+      padding: 16px 20px; margin: 12px 0; background: white; 
+      border: 2px solid #e2e8f0; border-radius: 15px; cursor: pointer; transition: 0.2s;
+    }
+    .opt-label:hover { border-color: var(--accent); background: #fff5f5; transform: translateX(5px); }
+    .opt-label input { width: auto; margin: 0 15px 0 0; transform: scale(1.4); accent-color: var(--primary); }
+
+    @media (max-width: 768px) {
+      .header h1 { font-size: 26px; }
+      .content { padding: 25px 20px; }
       .grid { grid-template-columns: 1fr; gap: 15px; }
-      .section-title { grid-column: span 1; font-size: 16px; }
       .full { grid-column: span 1; }
-      
-      .stepper { font-size: 11px; padding: 10px 5px; }
-      input, select, textarea { padding: 10px; font-size: 14px; }
-      
-      .admin-btn { top: 5px; right: 5px; font-size: 10px; padding: 2px 8px; }
     }
   </style>
 </head>
@@ -76,7 +140,7 @@
 <div class="container">
   <div class="header">
     <a href="admin.html" class="admin-btn">管理登入</a>
-    <h1>炎洲集團人才面試E化系統</h1>
+    <h1>炎洲集團人才招募申請中心</h1>
   </div>
 
   <div class="stepper">
@@ -90,15 +154,15 @@
     <!-- Step 1: 履歷填寫 -->
     <div id="step1" class="step active">
       <form id="resumeForm" class="grid">
-        <div class="section-title">個人基本資料</div>
-        <div class="input-group"><label>姓名 *</label><input type="text" name="name" placeholder="請輸入姓名" required></div>
+        <div class="section-title">基本資料 (Personal Info)</div>
+        <div class="input-group"><label>姓名 *</label><input type="text" name="name" placeholder="請輸入全名" required></div>
         <div class="input-group"><label>性別</label><select name="gender"><option>男</option><option>女</option></select></div>
         <div class="input-group"><label>出生日期 *</label><input type="date" name="birthday" required></div>
-        <div class="input-group"><label>電話 *</label><input type="tel" name="phone" placeholder="例：0912345678" required></div>
+        <div class="input-group"><label>聯絡電話 *</label><input type="tel" name="phone" placeholder="例：0912345678" required></div>
         <div class="input-group full"><label>電子郵件 *</label><input type="email" name="email" placeholder="example@mail.com" required></div>
         <div class="input-group full"><label>通訊地址</label><input type="text" name="address" placeholder="請輸入聯繫地址"></div>
 
-        <div class="section-title">專業背景與需求</div>
+        <div class="section-title">專業背景與需求 (Background)</div>
         <div class="input-group"><label>最高學歷</label><input type="text" name="edu" placeholder="例：大學"></div>
         <div class="input-group"><label>畢業學校</label><input type="text" name="school"></div>
         <div class="input-group"><label>科系名稱</label><input type="text" name="major"></div>
@@ -112,46 +176,55 @@
             <option>業務部</option><option>研發部</option><option>財務部</option>
           </select>
         </div>
-        <div class="input-group full"><label>工作經歷簡述</label><textarea name="expDetail" rows="3" placeholder="請簡述過去工作內容"></textarea></div>
-        <div class="input-group full"><label>專長技能</label><input type="text" name="skills" placeholder="例：Excel, Python, 專案管理"></div>
-        <div class="input-group full"><label>自我介紹</label><textarea name="intro" rows="4" placeholder="請簡單介紹您的優勢"></textarea></div>
+        <div class="input-group full">
+            <label>工作經歷簡述</label>
+            <textarea name="expDetail" placeholder="請簡述過去工作職責與內容"></textarea>
+        </div>
+        <div class="input-group full">
+            <label>專長技能 (可拉大此框)</label>
+            <textarea name="skills" placeholder="例：Excel 樞紐、Python 資料分析、專案管理證照..."></textarea>
+        </div>
+        <div class="input-group full">
+            <label>自我介紹</label>
+            <textarea name="intro" placeholder="請簡單介紹您的個人優勢"></textarea>
+        </div>
       </form>
       <button class="btn-next" onclick="submitStep1()">下一步：簽署聲明文件</button>
     </div>
 
     <!-- Step 2: 簽名 -->
     <div id="step2" class="step">
-      <h3 style="text-align:center;">應徵者個人資料蒐集同意書</h3>
-      <div style="background:#f8fafc; padding:15px; font-size:13px; color:#64748b; border-radius:8px; line-height:1.6; margin-bottom:15px;">
-        本人同意貴公司基於招募、評估之目的蒐集、處理及利用本人之個人資料。本人保證以上提供之資訊均為屬實。
+      <h3 style="text-align:center; font-size:26px; font-weight:900; color:var(--primary);">應徵者個人資料蒐集同意書</h3>
+      <div style="background:#fffafa; padding:25px; font-size:15px; color:#475569; border-radius:15px; line-height:1.8; margin-bottom:20px; border:1px solid var(--card-border);">
+        本人同意貴公司基於招募、評估、聯繫之目的蒐集、處理及利用本人之個人資料。本人保證以上提供之資訊均為屬實，如有虛偽願負相關法律責任。
       </div>
-      <label>請於下方區域完成手寫簽名：</label>
+      <label style="text-align:center; display:block; color:var(--primary);">請於下方灰色區域完成手寫簽名：</label>
       <div class="canvas-container">
         <canvas id="sig-pad"></canvas>
       </div>
-      <div style="display:flex; gap:10px; margin-top:10px;">
-        <button onclick="sig.clear()" style="flex:1; padding:12px; border-radius:8px; border:1px solid #ccc; background:white; cursor:pointer;">清除</button>
-        <button onclick="submitStep2()" class="btn-next" style="flex:2; margin-top:0;">確認簽署</button>
+      <div style="display:flex; gap:15px; margin-top:10px;">
+        <button onclick="sig.clear()" class="btn-clear">清除重簽</button>
+        <button onclick="submitStep2()" class="btn-next" style="flex:2; margin-top:0;">確認簽署並進入測驗</button>
       </div>
     </div>
 
     <!-- Step 3: 測驗 -->
     <div id="step3" class="step">
-      <h3 style="text-align:center;">專業適性評測</h3>
-      <p style="color:#718096; text-align:center; font-size:14px; margin-bottom:25px;">請選出最符合您的選項</p>
+      <h3 style="text-align:center; font-size:26px; font-weight:900; color:var(--primary);">專業適性評測</h3>
+      <p style="color:#718096; text-align:center; font-size:16px; margin-bottom:35px;">請仔細閱讀題目，並選出最符合您的選項</p>
       <div id="examContainer"></div>
       <button class="btn-next" id="submitBtn" onclick="handleFinalSubmit()">提交所有應徵資料</button>
     </div>
 
     <!-- Step 4: 完成 -->
-    <div id="step4" class="step" style="text-align:center; padding: 50px 0;">
-      <div style="font-size: 65px; color:#48bb78;">✓</div>
-      <h2 style="color:var(--primary)">申請提交完成</h2>
-      <div style="margin: 20px 0;">
-        <p style="color:#718096; margin-bottom:5px;">您的測驗得分</p>
-        <span id="scoreDisplay" style="font-size:48px; font-weight:bold; color:var(--accent);">0</span>
+    <div id="step4" class="step" style="text-align:center; padding: 60px 0;">
+      <div style="font-size: 100px; color:#48bb78; margin-bottom:20px;">✓</div>
+      <h2 style="color:var(--primary); font-size:40px; font-weight:900;">申請提交成功</h2>
+      <div style="margin: 30px 0; background:#f0fff4; padding:30px; border-radius:20px; border:2px solid #c6f6d5; display:inline-block; min-width:250px;">
+        <p style="color:#2f855a; margin-bottom:10px; font-weight:bold;">您的測驗得分</p>
+        <span id="scoreDisplay" style="font-size:72px; font-weight:900; color:#22c55e;">0</span>
       </div>
-      <p style="color:#718096; font-size:14px;">感謝參與，我們將在初步篩選後主動連繫您。</p>
+      <p style="color:#718096; font-size:16px; margin-top:20px;">感謝您的參與，我們將在初步篩選後主動連繫您。</p>
     </div>
   </div>
 </div>
@@ -190,12 +263,12 @@
     applicantName = data.name;
 
     showStep(2);
-    setTimeout(resizeCanvas, 150); // 確保在顯示後計算尺寸
+    setTimeout(resizeCanvas, 150); 
     await apiFetch({ action: 'submitResume', resumeData: JSON.stringify(data) });
   }
 
   async function submitStep2() {
-    if(sig.isEmpty()) return alert("請完成手寫簽名");
+    if(sig.isEmpty()) return alert("請完成手寫簽名以示負責");
     const sigData = sig.toDataURL();
     showStep(3);
     const res = await apiFetch({ action: 'getQuestions' }, true);
@@ -222,7 +295,7 @@
     const radios = document.querySelectorAll('#examContainer input:checked');
     if(radios.length === 0) {
       btn.disabled = false;
-      return alert("請回答所有測驗題目");
+      return alert("請回答所有測驗題目後再進行提交");
     }
     radios.forEach(r => answers[r.name.replace('q','')] = r.value);
 
