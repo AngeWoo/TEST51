@@ -9,145 +9,101 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap');
 
     :root { 
-      --primary: #991b1b; /* 深企業紅 */
-      --accent: #ef4444;  /* 緋紅 */
-      --bg: #fdf2f2;      
-      --card-border: #fee2e2;
-      --shadow-3d: 0 10px 25px -5px rgba(153, 27, 27, 0.15);
+      --primary: #991b1b; --accent: #ef4444; --bg: #fdf2f2;      
+      --card-border: #fee2e2; --shadow-3d: 0 10px 25px -5px rgba(153, 27, 27, 0.15);
       --btn-shadow: 0 6px 0 #b91c1c;
     }
 
-    body { 
-      font-family: 'Inter', 'Noto Sans TC', sans-serif; 
-      background: var(--bg); 
-      margin: 0; 
-      padding: 30px 15px; 
-      color: #1e293b; 
-      font-size: 18px; 
-      line-height: 1.6;
-      -webkit-tap-highlight-color: transparent;
-    }
+    body { font-family: 'Inter', 'Noto Sans TC', sans-serif; background: var(--bg); margin: 0; padding: 30px 15px; color: #1e293b; font-size: 18px; }
 
-    .container { 
-      max-width: 850px; 
-      margin: 0 auto; 
-      background: white; 
-      border-radius: 24px; 
-      box-shadow: 0 25px 50px -12px rgba(153, 27, 27, 0.15); 
-      overflow: hidden; 
-      position: relative; 
-      border: 1px solid var(--card-border);
-    }
+    .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 30px; box-shadow: 0 30px 60px -12px rgba(153, 27, 27, 0.15); overflow: hidden; position: relative; border: 1px solid var(--card-border); }
     
-    /* --- Header (同步 Admin 風格) --- */
-    .header { 
-      background: linear-gradient(135deg, #ef4444, #991b1b); 
-      color: white; 
-      padding: 40px 20px; 
-      text-align: center; 
-      position: relative;
-    }
-    .header h1 { margin: 0; font-size: 28px; font-weight: 900; letter-spacing: 1px; word-break: keep-all; }
+    /* --- Header --- */
+    .header { background: linear-gradient(135deg, #ef4444, #991b1b); color: white; padding: 40px 30px; text-align: center; position: relative; }
+    .header h1 { margin: 0; font-size: 28px; font-weight: 900; }
     
-    .admin-btn { 
-      position: absolute; top: 12px; right: 12px; 
-      color: white; font-size: 12px; text-decoration: none; 
-      border: 1px solid rgba(255,255,255,0.4); padding: 5px 12px; border-radius: 20px;
-      background: rgba(255,255,255,0.1); font-weight: bold;
-    }
+    .edit-resume-btn { position: absolute; bottom: 10px; right: 20px; background: white; color: var(--primary); border: none; padding: 8px 15px; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 0 #ddd; display: none; }
+    .edit-resume-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #ddd; }
 
     .content { padding: 30px; }
-    
-    /* --- 步驟指示器 --- */
-    .stepper { 
-      display: flex; justify-content: space-between; padding: 15px 20px; 
-      background: #fffafa; border-bottom: 2px solid var(--card-border); 
-      font-size: 15px; font-weight: 900; color: #94a3b8;
-    }
+    .stepper { display: flex; justify-content: space-between; padding: 15px 25px; background: #fffafa; border-bottom: 2px solid var(--card-border); font-size: 15px; font-weight: 900; color: #94a3b8; }
     .step-idx.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
 
     .step { display: none; animation: fadeIn 0.4s ease; }
     .step.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
 
-    /* --- 表單佈局 --- */
-    .section-title { 
-      font-size: 22px; color: var(--primary); font-weight: 900; 
-      border-left: 6px solid var(--accent); padding-left: 12px; 
-      margin: 30px 0 20px; grid-column: span 2; 
-    }
+    .section-title { font-size: 22px; color: var(--primary); font-weight: 900; border-left: 6px solid var(--accent); padding-left: 12px; margin: 30px 0 20px; grid-column: span 2; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .full { grid-column: span 2; }
     
-    label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 16px; color: #475569; }
+    label { display: block; margin-bottom: 5px; font-weight: 700; font-size: 16px; color: #475569; }
+    input, select, textarea { width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; box-sizing: border-box; font-size: 17px; background: #fff; }
+    input:focus { border-color: var(--accent); outline: none; }
+    textarea { resize: vertical; min-height: 100px; font-family: inherit; }
     
-    input, select, textarea { 
-      width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; 
-      box-sizing: border-box; font-size: 17px; transition: 0.2s; background: #fff;
-      appearance: none; /* 移除手機端預設內陰影 */
-    }
-    input:focus, textarea:focus { 
-      border-color: var(--accent); outline: none; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.08); 
-    }
-
-    textarea { resize: vertical; min-height: 120px; }
-
-    /* --- 3D 立體按鈕 --- */
-    .btn-next { 
-      background: var(--accent); color: white; border: none; padding: 18px; 
-      border-radius: 15px; font-weight: 900; cursor: pointer; width: 100%; 
-      font-size: 20px; margin-top: 25px; transition: 0.1s;
-      box-shadow: var(--btn-shadow);
-    }
+    .btn-next { background: var(--accent); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: 900; cursor: pointer; width: 100%; font-size: 20px; margin-top: 20px; box-shadow: var(--btn-shadow); }
     .btn-next:active { transform: translateY(4px); box-shadow: 0 2px 0 #b91c1c; }
 
-    .btn-clear { 
-      padding: 12px; border-radius: 12px; border: 2px solid #e2e8f0; 
-      background: white; font-size: 16px; font-weight: bold; cursor: pointer;
-    }
-
-    /* --- 簽名版 --- */
-    .canvas-container { 
-      width: 100%; background: #fdfdfd; border: 2px dashed var(--card-border); 
-      border-radius: 16px; margin: 15px 0; touch-action: none; 
-    }
-    canvas { width: 100%; height: 220px; cursor: crosshair; display: block; }
-
-    /* --- 測驗卡片 --- */
-    .q-card { 
-      background: #fffafa; padding: 25px; border-radius: 20px; 
-      margin-bottom: 20px; border: 1px solid var(--card-border);
-      box-shadow: var(--shadow-3d);
-    }
-    .q-card p { font-weight: 900; font-size: 18px; color: var(--primary); margin-top: 0; }
+    .q-card { background: #fffafa; padding: 25px; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--card-border); box-shadow: var(--shadow-3d); }
+    .q-card p { font-weight: 900; font-size: 19px; color: var(--primary); margin: 0 0 15px 0; text-align: left; }
     
-    .opt-label { 
-      display: flex; align-items: center; justify-content: flex-start; 
-      padding: 14px 18px; margin: 10px 0; background: white; 
-      border: 1px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: 0.2s;
-    }
+    .opt-label { display: flex; align-items: center; justify-content: flex-start; padding: 14px 18px; margin: 10px 0; background: white; border: 1px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: 0.2s; width: 100%; box-sizing: border-box; }
     .opt-label:hover { border-color: var(--accent); background: #fff5f5; }
-    .opt-label input { width: auto; margin: 0 12px 0 0; transform: scale(1.3); }
+    .opt-label input { width: 22px; height: 22px; margin: 0 15px 0 0; flex-shrink: 0; accent-color: var(--primary); }
+    .opt-text { text-align: left; font-weight: 600; }
 
-    /* --- 手機版專屬 RWD 修改 --- */
+    /* --- 立體簽名框優化 --- */
+    .signature-wrapper {
+      width: 100%;
+      background: #f1f5f9; /* 稍微深一點的背景底色 */
+      padding: 10px;
+      border-radius: 20px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); /* 外圍微凹 */
+      margin: 20px 0;
+    }
+    .canvas-container { 
+      width: 100%; 
+      background: white; 
+      border: 2px solid #cbd5e1; 
+      border-radius: 16px; 
+      touch-action: none;
+      position: relative;
+      /* 3D 內凹陰影核心 */
+      box-shadow: 
+        inset 2px 2px 8px rgba(0,0,0,0.1),
+        0 1px 2px rgba(255,255,255,1);
+      overflow: hidden;
+    }
+    canvas { width: 100%; height: 250px; cursor: crosshair; display: block; }
+    .sig-guide { position: absolute; bottom: 10px; right: 15px; color: #94a3b8; font-size: 12px; pointer-events: none; font-weight: bold; }
+
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(153, 27, 27, 0.6); backdrop-filter: blur(8px); z-index: 2000; justify-content: center; align-items: center; }
+    .modal-content { background: white; padding: 40px; border-radius: 35px; width: 95%; max-width: 800px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 40px 80px rgba(0,0,0,0.3); }
+    .close-btn { position: absolute; top: 20px; right: 20px; font-size: 30px; cursor: pointer; border: none; background: none; color: #999; }
+
+    .admin-footer { text-align: center; padding: 40px 20px; background: #fffafa; border-top: 1px solid var(--card-border); }
+    .btn-admin-footer { background: #4a5568; color: white; border: none; padding: 12px 25px; border-radius: 12px; font-size: 14px; font-weight: bold; cursor: pointer; text-decoration: none; transition: 0.3s; display: inline-block; }
+    .btn-admin-footer:hover { background: var(--primary); }
+
+    #saveToast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 3000; opacity: 0.9; }
+
     @media (max-width: 768px) {
+      .grid { grid-template-columns: 1fr; }
       .header h1 { font-size: 22px; }
       .content { padding: 20px; }
-      .grid { grid-template-columns: 1fr; gap: 15px; } /* 手機端改為單欄，避免重疊 */
-      .section-title { grid-column: span 1; font-size: 20px; margin-top: 20px; }
-      .full { grid-column: span 1; }
-      .stepper { font-size: 13px; padding: 12px 10px; }
-      .btn-next { font-size: 18px; padding: 15px; }
-      .q-card { padding: 20px; }
+      .signature-wrapper { padding: 5px; }
     }
   </style>
 </head>
 <body>
 
+<div id="saveToast">正在背景儲存資料...</div>
+
 <div class="container">
   <div class="header">
-    <a href="admin.html" class="admin-btn">管理登入</a>
-    <h1>炎洲集團人才面試E化系統</h1>
+    <h1>炎洲集團人才招募E化系統</h1>
+    <button id="editBtn" class="edit-resume-btn" onclick="openEditModal()">🖊️ 修改履歷</button>
   </div>
 
   <div class="stepper">
@@ -158,19 +114,18 @@
   </div>
 
   <div class="content">
-    <!-- Step 1: 履歷填寫 -->
     <div id="step1" class="step active">
       <form id="resumeForm" class="grid">
         <div class="section-title">個人基本資料</div>
-        <div class="input-group"><label>姓名 *</label><input type="text" name="name" placeholder="請輸入中文全名" required></div>
+        <div class="input-group"><label>姓名 *</label><input type="text" name="name" required></div>
         <div class="input-group"><label>性別</label><select name="gender"><option>男</option><option>女</option></select></div>
         <div class="input-group"><label>出生日期 *</label><input type="date" name="birthday" required></div>
-        <div class="input-group"><label>聯絡電話 *</label><input type="tel" name="phone" placeholder="例：0912345678" required></div>
-        <div class="input-group full"><label>電子郵件 *</label><input type="email" name="email" placeholder="example@mail.com" required></div>
-        <div class="input-group full"><label>通訊地址</label><input type="text" name="address" placeholder="請輸入聯絡地址"></div>
+        <div class="input-group"><label>聯絡電話 *</label><input type="tel" name="phone" required></div>
+        <div class="input-group full"><label>電子郵件 *</label><input type="email" name="email" required></div>
+        <div class="input-group full"><label>通訊地址</label><input type="text" name="address"></div>
 
         <div class="section-title">專業背景與需求</div>
-        <div class="input-group"><label>最高學歷</label><input type="text" name="edu" placeholder="例：大學"></div>
+        <div class="input-group"><label>最高學歷</label><input type="text" name="edu"></div>
         <div class="input-group"><label>畢業學校</label><input type="text" name="school"></div>
         <div class="input-group"><label>科系名稱</label><input type="text" name="major"></div>
         <div class="input-group"><label>工作年資 (年)</label><input type="number" name="expYears" value="0"></div>
@@ -183,44 +138,61 @@
             <option>業務部</option><option>研發部</option><option>財務部</option>
           </select>
         </div>
-        <div class="input-group full"><label>工作經歷簡述</label><textarea name="expDetail" placeholder="請簡述過去工作職責與內容"></textarea></div>
-        <div class="input-group full"><label>專長技能</label><textarea name="skills" placeholder="例：Excel 樞紐、Python 資料分析..."></textarea></div>
-        <div class="input-group full"><label>自我介紹</label><textarea name="intro" placeholder="請簡單介紹您的優勢"></textarea></div>
+        <div class="input-group full"><label>工作經歷簡述</label><textarea name="expDetail"></textarea></div>
+        <div class="input-group full"><label>專長技能</label><textarea name="skills"></textarea></div>
+        <div class="input-group full"><label>自我介紹</label><textarea name="intro"></textarea></div>
       </form>
       <button class="btn-next" onclick="submitStep1()">下一步：簽署文件</button>
     </div>
 
-    <!-- Step 2: 簽名 -->
     <div id="step2" class="step">
-      <h3 style="text-align:center; font-weight:900; color:var(--primary);">應徵者個人資料蒐集同意書</h3>
+      <h3 style="text-align:center;">應徵者個人資料蒐集同意書</h3>
       <div style="background:#fffafa; padding:20px; font-size:15px; color:#475569; border-radius:15px; border:1px solid var(--card-border); margin-bottom:15px;">
-        本人同意貴公司基於招募評估之目的蒐集、處理及利用本人之個人資料。本人保證以上資訊均屬實。
+        請完成下方簽名以確認您同意上述條款。
       </div>
-      <label style="text-align:center; display:block;">請在下方區域完成手寫簽名：</label>
-      <div class="canvas-container"><canvas id="sig-pad"></canvas></div>
+      
+      <!-- 優化後的立體簽名區域 -->
+      <div class="signature-wrapper">
+        <div class="canvas-container">
+          <canvas id="sig-pad"></canvas>
+          <div class="sig-guide">請在此親筆簽名</div>
+        </div>
+      </div>
+
       <div style="display:flex; gap:10px;">
-        <button onclick="sig.clear()" class="btn-clear">清除</button>
-        <button onclick="submitStep2()" class="btn-next" style="flex:2; margin-top:0;">確認簽署</button>
+        <button onclick="sig.clear()" class="btn-clear">清除重簽</button>
+        <button onclick="submitStep2()" class="btn-next" style="flex:2; margin-top:0;">確認簽署並開始測驗</button>
       </div>
     </div>
 
-    <!-- Step 3: 測驗 -->
     <div id="step3" class="step">
-      <h3 style="text-align:center; font-weight:900; color:var(--primary);">專業適性評測</h3>
+      <h3 style="text-align:center;">專業適性評測</h3>
       <div id="examContainer"></div>
       <button class="btn-next" id="submitBtn" onclick="handleFinalSubmit()">提交所有應徵資料</button>
     </div>
 
-    <!-- Step 4: 完成 -->
     <div id="step4" class="step" style="text-align:center; padding: 50px 0;">
       <div style="font-size: 80px; color:#48bb78;">✓</div>
       <h2 style="color:var(--primary); font-size:32px; font-weight:900;">申請提交成功</h2>
-      <div style="margin: 25px 0; background:#f0fff4; padding:25px; border-radius:20px; border:2px solid #c6f6d5; display:inline-block; min-width:200px;">
+      <div style="margin: 25px 0; background:#f0fff4; padding:25px; border-radius:20px; border:2px solid #c6f6d5; display:inline-block; min-width:250px;">
         <p style="color:#2f855a; margin-bottom:5px; font-weight:bold;">測驗得分</p>
         <span id="scoreDisplay" style="font-size:60px; font-weight:900; color:#22c55e;">0</span>
       </div>
       <p style="color:#718096;">感謝參與，我們將主動與您連繫。</p>
     </div>
+  </div>
+
+  <div class="admin-footer">
+    <a href="admin.html" class="btn-admin-footer">管理員登入入口</a>
+  </div>
+</div>
+
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closeModal()">✕</button>
+    <h2 style="color:var(--primary); font-weight:900; border-bottom:3px solid var(--primary); padding-bottom:10px; margin-bottom:20px;">修改履歷資料</h2>
+    <form id="editForm" class="grid"></form>
+    <button class="btn-next" onclick="saveEditedResume()">儲存修改內容</button>
   </div>
 </div>
 
@@ -229,8 +201,7 @@
   let sig, applicantName = "";
 
   window.onload = () => {
-    const canvas = document.getElementById('sig-pad');
-    sig = new SignaturePad(canvas);
+    sig = new SignaturePad(document.getElementById('sig-pad'));
     window.addEventListener("resize", resizeCanvas);
   };
 
@@ -243,12 +214,10 @@
     sig.clear();
   }
 
-  async function apiFetch(payload, useGet = false) {
-    let url = GAS_URL;
-    const options = { method: useGet ? 'GET' : 'POST', mode: 'cors', redirect: 'follow' };
-    if (useGet) { url += "?" + new URLSearchParams(payload).toString(); }
-    else { options.body = JSON.stringify(payload); }
-    const response = await fetch(url, options);
+  function showToast(show) { document.getElementById('saveToast').style.display = show ? 'block' : 'none'; }
+
+  async function apiFetch(payload) {
+    const response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
     return await response.json();
   }
 
@@ -258,31 +227,64 @@
     const data = Object.fromEntries(new FormData(form));
     applicantName = data.name;
     showStep(2);
+    document.getElementById('editBtn').style.display = 'block';
     setTimeout(resizeCanvas, 150); 
-    await apiFetch({ action: 'submitResume', resumeData: JSON.stringify(data) });
+    showToast(true);
+    fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'submitResume', resumeData: JSON.stringify(data) }) }).then(() => showToast(false));
   }
 
+  function openEditModal() {
+    const originalForm = document.getElementById('resumeForm');
+    const editForm = document.getElementById('editForm');
+    editForm.innerHTML = originalForm.innerHTML;
+    const inputs = originalForm.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+      const editInput = editForm.querySelector(`[name="${input.name}"]`);
+      if(editInput) editInput.value = input.value;
+    });
+    document.getElementById('editModal').style.display = 'flex';
+  }
+
+  async function saveEditedResume() {
+    const editForm = document.getElementById('editForm');
+    if(!editForm.reportValidity()) return;
+    const data = Object.fromEntries(new FormData(editForm));
+    const originalForm = document.getElementById('resumeForm');
+    for(let key in data) {
+      const input = originalForm.querySelector(`[name="${key}"]`);
+      if(input) input.value = data[key];
+    }
+    applicantName = data.name;
+    document.getElementById('editModal').style.display = 'none';
+    showToast(true);
+    await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateResume', resumeData: JSON.stringify(data) }) });
+    showToast(false);
+  }
+
+  function closeModal() { document.getElementById('editModal').style.display = 'none'; }
+
   async function submitStep2() {
-    if(sig.isEmpty()) return alert("請完成手寫簽名");
-    const sigData = sig.toDataURL();
+    if(sig.isEmpty()) return alert("請完成簽名");
     showStep(3);
-    const res = await apiFetch({ action: 'getQuestions' }, true);
+    const res = await (await fetch(GAS_URL + "?action=getQuestions")).json();
     document.getElementById('examContainer').innerHTML = res.data.map((q, idx) => `
       <div class="q-card"><p>Q${idx+1}. ${q.question}</p>
-        ${q.options.map((opt, i) => !opt ? '' : `<label class="opt-label"><input type="radio" name="q${q.id}" value="${i+1}" required><span>${i+1}. ${opt}</span></label>`).join('')}
+        ${q.options.map((opt, i) => !opt ? '' : `<label class="opt-label"><input type="radio" name="q${q.id}" value="${i+1}" required><span class="opt-text">${i+1}. ${opt}</span></label>`).join('')}
       </div>`).join('');
-    await apiFetch({ action: 'submitConsent', userName: applicantName, signatureData: sigData });
+    showToast(true);
+    fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'submitConsent', userName: applicantName, signatureData: sig.toDataURL() }) }).then(() => showToast(false));
   }
 
   async function handleFinalSubmit() {
     const btn = document.getElementById('submitBtn');
-    btn.disabled = true; btn.innerText = "資料處理中...";
-    const answers = {};
     const radios = document.querySelectorAll('#examContainer input:checked');
-    if(radios.length === 0) { btn.disabled = false; return alert("請回答所有題目"); }
+    if(radios.length === 0) return alert("請回答所有題目");
+    btn.disabled = true; btn.innerText = "結算中...";
+    const answers = {};
     radios.forEach(r => answers[r.name.replace('q','')] = r.value);
     const finalRes = await apiFetch({ action: 'submitAnswers', userName: applicantName, answers: JSON.stringify(answers) });
     document.getElementById('scoreDisplay').innerText = finalRes.score;
+    document.getElementById('editBtn').style.display = 'none';
     showStep(4);
   }
 
