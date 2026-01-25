@@ -2,7 +2,8 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <title>炎洲集團招募數據決策中心 | HR Analytics Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>招募數據決策中心 | HR Analytics Admin</title>
   <!-- 引入 Chart.js 用於報表分析 -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -10,45 +11,57 @@
     body { font-family: "Noto Sans TC", "Segoe UI", sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #2d3748; }
     .dashboard { max-width: 1400px; margin: auto; }
     
-    /* Header & Nav */
+    /* --- 登入畫面優化 (加大版) --- */
+    #loginArea { 
+      display: flex; justify-content: center; align-items: center; 
+      min-height: 80vh; padding: 20px; 
+    }
+    .login-card { 
+      background: white; padding: 50px 40px; border-radius: 20px; 
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15); 
+      width: 100%; max-width: 450px; text-align: center;
+    }
+    .login-card h2 { margin-bottom: 30px; font-size: 32px; color: var(--primary); font-weight: 800; }
+    .login-card input[type="password"] { 
+      width: 100%; height: 60px; padding: 15px; margin-bottom: 25px; 
+      border: 2px solid #e2e8f0; border-radius: 12px; font-size: 18px; 
+      box-sizing: border-box; transition: 0.3s;
+    }
+    .login-card input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 4px rgba(43, 108, 176, 0.1); }
+    .login-card button { 
+      width: 100%; height: 60px; background: var(--accent); color: white; 
+      border: none; border-radius: 12px; font-size: 20px; font-weight: bold; 
+      cursor: pointer; transition: 0.3s; box-shadow: 0 4px 12px rgba(43, 108, 176, 0.3);
+    }
+    .login-card button:hover { background: var(--primary); transform: translateY(-2px); }
+    .login-card .back-home { margin-top: 25px; display: block; color: var(--accent); text-decoration: none; font-size: 16px; font-weight: 500; }
+
+    /* 手機版登入區域適配 */
+    @media (max-width: 600px) {
+      #loginArea { min-height: 70vh; }
+      .login-card { padding: 40px 25px; max-width: 95%; }
+      .login-card h2 { font-size: 26px; }
+    }
+
+    /* --- 主儀表板樣式 --- */
     .header { background: white; padding: 20px 30px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; }
-    .nav-group { display: flex; gap: 10px; }
     .btn-nav { padding: 8px 18px; border-radius: 6px; border: 1px solid #e2e8f0; background: white; cursor: pointer; font-size: 14px; font-weight: bold; text-decoration: none; color: #4a5568; transition: 0.2s; }
-    .btn-nav:hover { background: #f8fafc; border-color: var(--accent); color: var(--accent); }
-
-    /* 統計卡片網格 */
-    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px; }
-    .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 5px solid var(--accent); transition: transform 0.2s; }
-    .stat-card:hover { transform: translateY(-3px); }
-    .stat-label { font-size: 13px; color: #718096; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
-    .stat-value { font-size: 28px; font-weight: 800; color: var(--primary); }
-    .stat-desc { font-size: 12px; color: #a0aec0; margin-top: 5px; }
-
-    /* Toolbar */
-    .toolbar { background: white; padding: 20px; border-radius: 12px; display: flex; gap: 15px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); align-items: center; flex-wrap: wrap; }
-    input, select { padding: 10px 15px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; }
-    input:focus { border-color: var(--accent); }
     
-    /* Table Section */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px; }
+    .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 5px solid var(--accent); }
+    .stat-value { font-size: 28px; font-weight: 800; color: var(--primary); }
+
+    .toolbar { background: white; padding: 20px; border-radius: 12px; display: flex; gap: 15px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); align-items: center; flex-wrap: wrap; }
+    input, select { padding: 10px 15px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; }
+    
     .content-box { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 25px; }
     table { width: 100%; border-collapse: collapse; }
     th { background: #f8fafc; padding: 15px; text-align: left; border-bottom: 2px solid #e2e8f0; font-size: 13px; color: #4a5568; cursor: pointer; user-select: none; }
-    th:hover { background: #ebf8ff; }
     td { padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 14px; }
-    tr:hover { background: #fafafa; }
     .badge { padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; }
 
-    /* Pagination */
-    .pagination { display: flex; justify-content: center; align-items: center; gap: 15px; padding: 20px; background: white; border-top: 1px solid #edf2f7; }
-    .page-btn { padding: 8px 16px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    /* 分析圖表區塊 */
     .report-section { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 25px; }
-    @media (max-width: 900px) { .report-section { grid-template-columns: 1fr; } }
     .report-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-    .report-title { font-size: 16px; font-weight: bold; margin-bottom: 20px; border-left: 4px solid var(--accent); padding-left: 10px; }
-    canvas { max-height: 300px; }
 
     /* Modals */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
@@ -56,32 +69,35 @@
     .close-btn { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; border: none; background: none; }
     .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
     .detail-label { font-size: 11px; color: #718096; font-weight: bold; }
-    .detail-val { font-size: 15px; color: #2d3748; margin-top: 2px; }
+    .detail-val { font-size: 15px; color: #2d3748; }
     .full-row { grid-column: span 3; background: #f8fafc; padding: 12px; border-radius: 6px; }
-    #loginArea { text-align: center; margin-top: 100px; }
+
+    @media (max-width: 600px) {
+      .detail-grid { grid-template-columns: 1fr 1fr; }
+      .toolbar select, .toolbar input { flex: 1 1 100% !important; }
+    }
   </style>
 </head>
 <body>
 
+<!-- 登入區域 -->
 <div id="loginArea">
-  <div class="dashboard" style="max-width:350px;">
-    <div style="background:white; padding:40px; border-radius:16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-      <h3 style="margin-top:0;">管理授權登入</h3>
-      <input type="password" id="pw" style="width:100%; margin-bottom:20px; box-sizing:border-box;" placeholder="請輸入管理密碼" onkeypress="if(event.keyCode==13) loadData()">
-      <button onclick="loadData()" style="width:100%; padding:12px; background:var(--accent); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">進入招募決策中心</button>
-      <div style="margin-top:20px;"><a href="index.html" style="font-size:13px; color:var(--accent);">返回應徵頁面</a></div>
-    </div>
+  <div class="login-card">
+    <h2>管理授權登入</h2>
+    <input type="password" id="pw" placeholder="請輸入管理密碼" onkeypress="if(event.keyCode==13) loadData()">
+    <button onclick="loadData()">進入招募決策中心</button>
+    <a href="index.html" class="back-home">返回應徵頁面</a>
   </div>
 </div>
 
 <div id="mainUI" class="dashboard" style="display:none;">
   <div class="header">
     <div>
-      <h2 style="margin:0; color:var(--primary);">人力招募數據決策儀表板</h2>
-      <p style="color:var(--gray); margin:0; font-size:12px;">Recruitment Data Analytics Center</p>
+      <h2 style="margin:0; color:var(--primary);">招募數據決策儀表板</h2>
+      <p style="color:var(--gray); margin:0; font-size:12px;">台北時區數據顯示 • 每頁 201 筆</p>
     </div>
     <div class="nav-group">
-      <a href="index.html" class="btn-nav">回招募首頁</a>
+      <a href="index.html" class="btn-nav">回應徵首頁</a>
       <button class="btn-nav" style="color:var(--danger)" onclick="location.reload()">登出系統</button>
     </div>
   </div>
@@ -91,27 +107,22 @@
     <div class="stat-card">
       <div class="stat-label">📊 總應徵人數</div>
       <div id="s-total" class="stat-value">0</div>
-      <div class="stat-desc">累計收件總數</div>
     </div>
     <div class="stat-card" style="border-top-color: var(--success);">
       <div class="stat-label">📈 平均測驗得分</div>
       <div id="s-avg" class="stat-value">0</div>
-      <div class="stat-desc">全體候選人平均</div>
     </div>
     <div class="stat-card" style="border-top-color: var(--warning);">
       <div class="stat-label">📅 今日新增</div>
       <div id="s-today" class="stat-value">0</div>
-      <div class="stat-desc">台北時區今日統計</div>
     </div>
     <div class="stat-card" style="border-top-color: #6b46c1;">
       <div class="stat-label">🏆 最高得分</div>
       <div id="s-max" class="stat-value">0</div>
-      <div class="stat-desc">目前的最高分紀錄</div>
     </div>
     <div class="stat-card" style="border-top-color: #319795;">
       <div class="stat-label">✅ 及格率 (60+)</div>
       <div id="s-pass" class="stat-value">0%</div>
-      <div class="stat-desc">得分高於60分比例</div>
     </div>
   </div>
 
@@ -129,8 +140,8 @@
           <th onclick="triggerSort('name')">候選人 <span id="icon-name"></span></th>
           <th onclick="triggerSort('dept')">需求單位 <span id="icon-dept"></span></th>
           <th onclick="triggerSort('position')">應徵職務 <span id="icon-position"></span></th>
-          <th onclick="triggerSort('score')">測驗分數 <span id="icon-score"></span></th>
-          <th onclick="triggerSort('timestamp')">測驗日期 <span id="icon-timestamp"></span></th>
+          <th onclick="triggerSort('score')">分數 <span id="icon-score"></span></th>
+          <th onclick="triggerSort('timestamp')">時間 <span id="icon-timestamp"></span></th>
           <th>操作</th>
         </tr>
       </thead>
@@ -146,11 +157,11 @@
   <!-- 分析報表區 -->
   <div class="report-section">
     <div class="report-card">
-      <div class="report-title">部門人才分佈分析</div>
+      <div style="font-weight:bold; margin-bottom:15px; border-left:4px solid var(--accent); padding-left:10px;">部門人才分佈分析</div>
       <canvas id="deptChart"></canvas>
     </div>
     <div class="report-card">
-      <div class="report-title">測驗分數質量分佈</div>
+      <div style="font-weight:bold; margin-bottom:15px; border-left:4px solid var(--accent); padding-left:10px;">測驗分數質量分佈</div>
       <canvas id="scoreChart"></canvas>
     </div>
   </div>
@@ -170,7 +181,7 @@
     <div style="font-size: 16px; color: var(--accent); font-weight: bold; border-bottom: 2px solid #eee; padding-bottom: 5px; margin: 25px 0 15px;">履歷詳情</div>
     <div class="detail-grid" id="profile-extra"></div>
     <div style="font-size: 16px; color: var(--accent); font-weight: bold; border-bottom: 2px solid #eee; padding-bottom: 5px; margin: 25px 0 15px;">數位簽署</div>
-    <div style="text-align:center;"><img id="m-sig" style="max-width:350px; border:1px solid #eee; border-radius:8px;"></div>
+    <div style="text-align:center;"><img id="m-sig" style="max-width:320px; border:1px solid #eee; border-radius:8px;"></div>
   </div>
 </div></div>
 
@@ -197,7 +208,6 @@
         document.getElementById('loginArea').style.display = 'none'; 
         document.getElementById('mainUI').style.display = 'block';
         
-        // 下拉選單
         const depts = [...new Set(rawData.map(r => r.dept))];
         document.getElementById('filterDept').innerHTML = '<option value="">所有需求單位</option>' + depts.map(d => `<option value="${d}">${d}</option>`).join('');
         const jobs = [...new Set(rawData.map(r => r.position))];
@@ -215,7 +225,7 @@
     filteredData = rawData.filter(r => String(r.name).toLowerCase().includes(name) && (!dept || r.dept === dept) && (!pos || r.position === pos));
     currentPage = 1; 
     executeSort();
-    updateDashboardStats(); // 更新卡片與圖表
+    updateDashboardStats();
   }
 
   function triggerSort(key) {
@@ -252,8 +262,7 @@
         <td><span class="badge" style="background:${r.score >= 80 ? '#c6f6d5':'#ebf8ff'}; color:${r.score >= 80 ? '#22543d':'#2b6cb0'}">${r.score}</span></td>
         <td>${r.timestamp}</td>
         <td>
-          <button onclick="viewProfile('${r.name}')" class="page-btn" style="padding:4px 8px;font-size:11px;">詳情</button>
-          <button onclick="importHR('${r.name}')" class="page-btn" style="padding:4px 8px;font-size:11px;background:#4a5568;color:white;">JSON</button>
+          <button onclick="viewProfile('${r.name}')" class="btn-nav" style="padding:4px 8px; font-size:11px;">詳情</button>
         </td>
       </tr>`).join('');
 
@@ -266,37 +275,23 @@
   function updateDashboardStats() {
     const data = filteredData;
     const total = data.length;
-    
-    // 卡片 1: 總人數
     document.getElementById('s-total').innerText = total;
-
-    // 卡片 2: 平均分
     const avg = total ? (data.reduce((acc, c) => acc + c.score, 0) / total).toFixed(1) : 0;
     document.getElementById('s-avg').innerText = avg;
-
-    // 卡片 3: 今日新增 (基於台北時區日期字串)
     const todayStr = new Date().toLocaleDateString('zh-TW', {year:'numeric', month:'2-digit', day:'2-digit'}).replace(/-/g, '/');
     const todayCount = data.filter(r => r.timestamp.startsWith(todayStr)).length;
     document.getElementById('s-today').innerText = todayCount;
-
-    // 卡片 4: 最高分
     const maxScore = total ? Math.max(...data.map(r => r.score)) : 0;
     document.getElementById('s-max').innerText = maxScore;
-
-    // 卡片 5: 及格率
     const passCount = data.filter(r => r.score >= 60).length;
     const passRate = total ? ((passCount / total) * 100).toFixed(1) : 0;
     document.getElementById('s-pass').innerText = passRate + "%";
-
     updateCharts(data);
   }
 
   function updateCharts(data) {
-    // 部門分佈數據
     const deptCounts = {};
     data.forEach(r => deptCounts[r.dept] = (deptCounts[r.dept] || 0) + 1);
-    
-    // 分數區間數據
     const scoreBins = {"0-20":0, "21-40":0, "41-60":0, "61-80":0, "81-100":0};
     data.forEach(r => {
       if(r.score <= 20) scoreBins["0-20"]++;
@@ -306,44 +301,23 @@
       else scoreBins["81-100"]++;
     });
 
-    // 銷毀舊圖表防止重疊
     if(deptChart) deptChart.destroy();
     if(scoreChart) scoreChart.destroy();
 
-    const ctx1 = document.getElementById('deptChart').getContext('2d');
-    deptChart = new Chart(ctx1, {
+    deptChart = new Chart(document.getElementById('deptChart'), {
       type: 'pie',
-      data: {
-        labels: Object.keys(deptCounts),
-        datasets: [{
-          data: Object.values(deptCounts),
-          backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796']
-        }]
-      },
+      data: { labels: Object.keys(deptCounts), datasets: [{ data: Object.values(deptCounts), backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796'] }] },
       options: { responsive: true, maintainAspectRatio: false }
     });
 
-    const ctx2 = document.getElementById('scoreChart').getContext('2d');
-    scoreChart = new Chart(ctx2, {
+    scoreChart = new Chart(document.getElementById('scoreChart'), {
       type: 'bar',
-      data: {
-        labels: Object.keys(scoreBins),
-        datasets: [{
-          label: '人數',
-          data: Object.values(scoreBins),
-          backgroundColor: '#2b6cb0'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-      }
+      data: { labels: Object.keys(scoreBins), datasets: [{ label: '人數', data: Object.values(scoreBins), backgroundColor: '#2b6cb0' }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
     });
   }
 
-  function changePage(offset) { currentPage += offset; renderTable(); window.scrollTo(0,0); }
+  function changePage(offset) { currentPage += offset; renderTable(); window.scrollTo(0, 0); }
 
   async function viewProfile(name) {
     document.getElementById('detailModal').style.display = 'flex';
@@ -353,11 +327,9 @@
     if(res.success) {
       const d = res.data; const r = d.resumeArray;
       const fmtDate = (v) => v ? new Date(v).toLocaleDateString('zh-TW') : '---';
-      
-      document.getElementById('m-name').innerText = `候選人詳情：${name}`;
+      document.getElementById('m-name').innerText = `候選人：${name}`;
       document.getElementById('m-score-tag').innerText = d.score + ' 分';
       document.getElementById('m-score-tag').style.background = d.score >= 80 ? '#c6f6d5':'#ebf8ff';
-      
       document.getElementById('profile-base').innerHTML = `
         <div class="detail-item"><div class="detail-label">姓名</div><div class="detail-val">${r[1]}</div></div>
         <div class="detail-item"><div class="detail-label">性別</div><div class="detail-val">${r[2]}</div></div>
@@ -367,7 +339,6 @@
         <div class="detail-item"><div class="detail-label">需求單位</div><div class="detail-val">${r[15]}</div></div>
         <div class="detail-item full-row"><div class="detail-label">通訊地址</div><div class="detail-val">${r[6]}</div></div>
       `;
-
       document.getElementById('profile-extra').innerHTML = `
         <div class="detail-item"><div class="detail-label">最高學歷</div><div class="detail-val">${r[7]}</div></div>
         <div class="detail-item"><div class="detail-label">畢業學校</div><div class="detail-val">${r[8]}</div></div>
@@ -378,24 +349,12 @@
         <div class="detail-item full-row"><div class="detail-label">專長技能</div><div class="detail-val">${r[13]}</div></div>
         <div class="detail-item full-row"><div class="detail-label">自我介紹</div><div class="detail-val">${r[14]}</div></div>
       `;
-      
       document.getElementById('m-sig').src = d.signature || "";
       document.getElementById('detail-loading').style.display = 'none';
       document.getElementById('detail-body').style.display = 'block';
     }
   }
 
-  async function importHR(name) {
-    document.getElementById('jsonModal').style.display = 'flex';
-    const res = await (await fetch(`${API_URL}?action=getFullCandidateInfo&password=${encodeURIComponent(currentPw)}&userName=${encodeURIComponent(name)}`)).json();
-    if(res.success) {
-        const r = res.data.resumeArray;
-        const out = { candidate: { name: r[1], dept: r[15], job: r[11], phone: r[4], email: r[5] }, score: res.data.score };
-        document.getElementById('jsonDisplay').innerText = JSON.stringify(out, null, 2);
-    }
-  }
-  
-  function copyJson() { navigator.clipboard.writeText(document.getElementById('jsonDisplay').innerText).then(() => alert("已複製")); }
   function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 </script>
 </body>
