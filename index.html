@@ -3,434 +3,140 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>人資面試考試系統</title>
+  <title>人才招募系統 | Career Application</title>
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: '微軟正黑體', Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      padding: 20px;
-    }
-    
-    .container {
-      max-width: 700px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-      padding: 40px;
-    }
-    
-    .header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    
-    h1 {
-      color: #333;
-      margin-bottom: 10px;
-      font-size: 28px;
-    }
-    
-    .info {
-      color: #666;
-      font-size: 14px;
-    }
-    
-    .user-info {
-      margin-bottom: 30px;
-    }
-    
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #333;
-      font-weight: 500;
-    }
-    
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 14px;
-    }
-    
-    .question-block {
-      margin-bottom: 25px;
-      padding: 20px;
-      background: #f9f9f9;
-      border-left: 4px solid #667eea;
-      border-radius: 4px;
-    }
-    
-    .question-title {
-      font-weight: bold;
-      margin-bottom: 15px;
-      color: #333;
-      font-size: 16px;
-    }
-    
-    .question-num {
-      color: #667eea;
-      font-size: 12px;
-      margin-bottom: 5px;
-      text-transform: uppercase;
-    }
-    
-    .options label {
-      display: block;
-      margin: 10px 0;
-      padding: 8px;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: background 0.2s;
-    }
-    
-    .options label:hover {
-      background: #eee;
-    }
-    
-    input[type="radio"] {
-      margin-right: 10px;
-      cursor: pointer;
-    }
-    
-    .button-group {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 30px;
-    }
-    
-    button {
-      padding: 12px 30px;
-      border: none;
-      border-radius: 4px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-weight: 500;
-    }
-    
-    .btn-submit {
-      background: #667eea;
-      color: white;
-    }
-    
-    .btn-submit:hover {
-      background: #5568d3;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-    }
-    
-    .btn-reset {
-      background: #ddd;
-      color: #333;
-    }
-    
-    .btn-reset:hover {
-      background: #ccc;
-    }
-    
-    .loading {
-      display: none;
-      text-align: center;
-      color: #667eea;
-      margin: 20px 0;
-    }
-    
-    .spinner {
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #667eea;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      animation: spin 1s linear infinite;
-      display: inline-block;
-      margin-right: 10px;
-      vertical-align: middle;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    .result {
-      display: none;
-      margin-top: 30px;
-      padding: 25px;
-      background: #f0f9ff;
-      border: 2px solid #667eea;
-      border-radius: 8px;
-      text-align: center;
-    }
-    
-    .result-score {
-      font-size: 48px;
-      font-weight: bold;
-      color: #667eea;
-      margin: 20px 0;
-    }
-    
-    .result-info {
-      color: #666;
-      font-size: 14px;
-      margin-bottom: 20px;
-    }
-    
-    .result-detail {
-      margin-top: 15px;
-      text-align: left;
-    }
-    
-    .result-item {
-      padding: 10px;
-      margin: 8px 0;
-      background: white;
-      border-radius: 4px;
-      font-size: 13px;
-      border-left: 4px solid;
-    }
-    
-    .correct {
-      border-left-color: #4caf50;
-    }
-    
-    .incorrect {
-      border-left-color: #f44336;
-    }
-    
-    .error {
-      color: #f44336;
-      padding: 15px;
-      background: #ffebee;
-      border-radius: 4px;
-      margin: 15px 0;
-      display: none;
-    }
-    
-    .admin-link {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      padding: 8px 16px;
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-      text-decoration: none;
-      border-radius: 4px;
-      font-size: 14px;
-      transition: all 0.3s;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-    
-    .admin-link:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: translateY(-2px);
-    }
-    
-    .container {
-      position: relative;
-    }
+    :root { --primary: #1a365d; --accent: #2b6cb0; --bg: #f7fafc; --text: #2d3748; }
+    body { font-family: "Noto Sans TC", sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--text); line-height: 1.5; }
+    .container { max-width: 900px; margin: 20px auto; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; position: relative; }
+    .header { background: var(--primary); color: white; padding: 35px 30px; text-align: center; position: relative; }
+    .admin-btn { position: absolute; top: 15px; right: 15px; color: rgba(255,255,255,0.7); font-size: 11px; text-decoration: none; border: 1px solid rgba(255,255,255,0.4); padding: 4px 10px; border-radius: 20px; transition: 0.3s; }
+    .content { padding: 30px; }
+    .stepper { display: flex; justify-content: space-between; padding: 15px 30px; background: #fff; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
+    .step-idx { color: #cbd5e0; font-weight: bold; }
+    .step-idx.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+    .step { display: none; animation: fadeIn 0.4s ease; }
+    .step.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+    .section-title { font-size: 18px; color: var(--primary); border-left: 4px solid var(--accent); padding-left: 10px; margin: 25px 0 15px; grid-column: span 2; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .full { grid-column: span 2; }
+    label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+    .canvas-container { width: 100%; background: #fdfdfd; border: 1px dashed #cbd5e0; border-radius: 8px; margin: 15px 0; touch-action: none; }
+    canvas { width: 100%; height: 200px; cursor: crosshair; display: block; }
+    .q-card { background: #f8fafc; padding: 25px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
+    .opt-label { display: flex; align-items: center; justify-content: flex-start; padding: 12px 15px; margin: 8px 0; background: white; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+    .opt-label:hover { border-color: var(--accent); background: #ebf8ff; }
+    .opt-label input { width: auto; margin: 0 15px 0 0; }
+    .btn-next { background: var(--accent); color: white; border: none; padding: 16px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; margin-top: 15px; }
   </style>
 </head>
 <body>
-  <a href="?page=admin" class="admin-link">🔐 管理後台</a>
-  <div class="container">
-    <div class="header">
-      <h1>📋 人資面試考試</h1>
-      <p class="info">5道選擇題，每題20分</p>
-    </div>
-    
-    <div class="user-info">
-      <label for="userName">姓名：</label>
-      <input type="text" id="userName" placeholder="請輸入姓名" />
-    </div>
-    
-    <form id="examForm">
-      <div id="questionsContainer"></div>
-      
-      <div class="button-group">
-        <button type="submit" class="btn-submit">提交答案</button>
-        <button type="reset" class="btn-reset">重新填寫</button>
-      </div>
-    </form>
-    
-    <div class="loading">
-      <span class="spinner"></span>
-      <span>批改中...</span>
-    </div>
-    
-    <div class="result">
-      <h2>📊 考試結果</h2>
-      <div class="result-score" id="finalScore"></div>
-      <div class="result-info" id="scoreInfo"></div>
-      <div class="result-detail" id="resultDetail"></div>
-    </div>
-    
-    <div class="error" id="errorMsg"></div>
+<div class="container">
+  <div class="header">
+    <a href="admin.html" class="admin-btn">管理登入</a>
+    <h1>企業人才面試E化系統</h1>
   </div>
-
-  <script>
-    // ========== 設定 Google Apps Script API URL ==========
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbz-oHS4wMPAJd1BAQSLCb2qaI4grUD6EtU9HVsnQthdVA43_i52MBWX0IYPDVFu-Ss0BA/exec';
-    
-    // 頁面載入時取得題目
-    document.addEventListener('DOMContentLoaded', () => {
-      loadQuestions();
-      document.getElementById('examForm').addEventListener('submit', handleSubmit);
-    });
-    
-    // 取得題目
-    async function loadQuestions() {
-      try {
-        const response = await fetch(GAS_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: new URLSearchParams({
-            action: 'getQuestions'
-          })
-        });
-        
-        const text = await response.text();
-        const result = JSON.parse(text);
-        
-        if (result.success) {
-          renderQuestions(result.data);
-        } else {
-          showError('載入題目失敗：' + result.message);
-        }
-      } catch (error) {
-        showError('連線錯誤：' + error.message);
-      }
-    }
-    
-    // 顯示題目
-    function renderQuestions(questions) {
-      const container = document.getElementById('questionsContainer');
-      container.innerHTML = '';
-      
-      questions.forEach((q, index) => {
-        const block = document.createElement('div');
-        block.className = 'question-block';
-        
-        let html = `
-          <div class="question-num">第 ${index + 1} 題</div>
-          <div class="question-title">${escapeHtml(q.question)}</div>
-          <div class="options">
-        `;
-        
-        q.options.forEach((option) => {
-          html += `
-            <label>
-              <input type="radio" name="q${q.id}" value="${option}" required />
-              ${escapeHtml(option)}
-            </label>
-          `;
-        });
-        
-        html += '</div>';
-        block.innerHTML = html;
-        container.appendChild(block);
-      });
-    }
-    
-    // 提交答案
-    async function handleSubmit(e) {
-      e.preventDefault();
-      
-      const userName = document.getElementById('userName').value.trim();
-      if (!userName) {
-        showError('請輸入姓名');
-        return;
-      }
-      
-      // 收集答案
-      const answers = {};
-      const formData = new FormData(document.getElementById('examForm'));
-      for (const [key, value] of formData.entries()) {
-        answers[key] = value;
-      }
-      
-      // 顯示載入中
-      document.querySelector('.loading').style.display = 'block';
-      document.querySelector('.result').style.display = 'none';
-      document.getElementById('errorMsg').style.display = 'none';
-      
-      try {
-        const response = await fetch(GAS_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: new URLSearchParams({
-            action: 'submitAnswers',
-            answers: JSON.stringify(answers),
-            userName: userName
-          })
-        });
-        
-        const text = await response.text();
-        const result = JSON.parse(text);
-        
-        document.querySelector('.loading').style.display = 'none';
-        
-        if (result.success) {
-          displayResult(result);
-        } else {
-          showError('批改失敗：' + result.message);
-        }
-      } catch (error) {
-        document.querySelector('.loading').style.display = 'none';
-        showError('提交失敗：' + error.message);
-      }
-    }
-    
-    // 顯示結果
-    function displayResult(result) {
-      const correctCount = result.details.filter(d => d.earned === d.total).length;
-      document.getElementById('finalScore').textContent = result.score;
-      document.getElementById('scoreInfo').textContent = `答對 ${correctCount}/5 題`;
-      
-      document.getElementById('resultDetail').innerHTML = result.details.map((d, idx) => {
-        const isCorrect = d.earned === d.total;
-        return `
-          <div class="result-item ${isCorrect ? 'correct' : 'incorrect'}">
-            第 ${idx + 1} 題：<strong>${d.earned}/${d.total} 分</strong>
-            ${!isCorrect ? `
-              <br/><small>您的答案：${escapeHtml(d.userAnswer)}</small>
-              <br/><small style="color: #4caf50;">正確答案：${escapeHtml(d.correctAnswer)}</small>
-            ` : ''}
-          </div>
-        `;
-      }).join('');
-      
-      document.querySelector('.result').style.display = 'block';
-      window.scrollTo(0, 0);
-    }
-    
-    // 顯示錯誤訊息
-    function showError(msg) {
-      const errorDiv = document.getElementById('errorMsg');
-      errorDiv.textContent = msg;
-      errorDiv.style.display = 'block';
-    }
-    
-    // HTML 轉義
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-  </script>
+  <div class="stepper">
+    <div id="s1" class="step-idx active">1. 填寫履歷</div>
+    <div id="s2" class="step-idx">2. 簽署文件</div>
+    <div id="s3" class="step-idx">3. 專業測驗</div>
+    <div id="s4" class="step-idx">4. 申請完成</div>
+  </div>
+  <div class="content">
+    <div id="step1" class="step active">
+      <form id="resumeForm" class="grid">
+        <div class="section-title">個人基本資料</div>
+        <div class="input-group"><label>姓名 *</label><input type="text" name="name" required></div>
+        <div class="input-group"><label>性別</label><select name="gender"><option>男</option><option>女</option></select></div>
+        <div class="input-group"><label>出生日期 *</label><input type="date" name="birthday" required></div>
+        <div class="input-group"><label>電話 *</label><input type="tel" name="phone" required></div>
+        <div class="input-group full"><label>電子郵件 *</label><input type="email" name="email" required></div>
+        <div class="input-group full"><label>通訊地址</label><input type="text" name="address"></div>
+        <div class="section-title">專業背景與需求</div>
+        <div class="input-group"><label>最高學歷</label><input type="text" name="edu"></div>
+        <div class="input-group"><label>畢業學校</label><input type="text" name="school"></div>
+        <div class="input-group"><label>科系名稱</label><input type="text" name="major"></div>
+        <div class="input-group"><label>工作年資 (年)</label><input type="number" name="expYears" value="0"></div>
+        <div class="input-group"><label>應徵職務 *</label><input type="text" name="job" required></div>
+        <div class="input-group"><label>需求單位 *</label>
+          <select name="dept" required>
+            <option value="">請選擇單位</option>
+            <option>行政部</option><option>技術開發部</option><option>行銷部</option>
+            <option>業務部</option><option>研發部</option><option>財務部</option>
+          </select>
+        </div>
+        <div class="input-group full"><label>工作經歷簡述</label><textarea name="expDetail" rows="3"></textarea></div>
+        <div class="input-group full"><label>專長技能</label><input type="text" name="skills"></div>
+        <div class="input-group full"><label>自我介紹</label><textarea name="intro" rows="4"></textarea></div>
+      </form>
+      <button class="btn-next" onclick="submitStep1()">下一步：簽署文件</button>
+    </div>
+    <div id="step2" class="step">
+      <h3 style="text-align:center;">應徵者個人資料蒐集同意書</h3>
+      <div class="canvas-container"><canvas id="sig-pad"></canvas></div>
+      <div style="display:flex; gap:10px;">
+        <button onclick="sig.clear()" style="flex:1; padding:10px; border-radius:8px; border:1px solid #ccc; background:white;">清除</button>
+        <button onclick="submitStep2()" class="btn-next" style="flex:2; margin-top:0;">確認簽署並開始測驗</button>
+      </div>
+    </div>
+    <div id="step3" class="step">
+      <h3 style="text-align:center;">專業適性評測</h3>
+      <div id="examContainer"></div>
+      <button class="btn-next" id="submitBtn" onclick="handleFinalSubmit()">提交所有應徵資料</button>
+    </div>
+    <div id="step4" class="step" style="text-align:center; padding: 50px 0;">
+      <div style="font-size: 65px; color:#48bb78;">✓</div>
+      <h2 style="color:var(--primary)">申請提交完成</h2>
+      <p>評測得分：<span id="scoreDisplay" style="font-size:48px; font-weight:bold; color:var(--accent);">0</span></p>
+    </div>
+  </div>
+</div>
+<script>
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbyQowSQ7CyUi44l5b3QXbkiEylN1TOeTUIxtirDOnbh1qbXH1YnZ3v0ylq2-kjsXQjxCQ/exec";
+  let sig, applicantName = "";
+  window.onload = () => { sig = new SignaturePad(document.getElementById('sig-pad')); };
+  function resizeCanvas() {
+    const canvas = document.getElementById('sig-pad');
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    canvas.width = canvas.offsetWidth * ratio; canvas.height = canvas.offsetHeight * ratio;
+    canvas.getContext("2d").scale(ratio, ratio); sig.clear();
+  }
+  async function apiFetch(payload, useGet = false) {
+    let url = GAS_URL;
+    const options = { method: useGet ? 'GET' : 'POST', mode: 'cors', redirect: 'follow' };
+    if (useGet) { url += "?" + new URLSearchParams(payload).toString(); }
+    else { options.body = JSON.stringify(payload); }
+    return await (await fetch(url, options)).json();
+  }
+  async function submitStep1() {
+    const data = Object.fromEntries(new FormData(document.getElementById('resumeForm')));
+    if(!data.name || !data.dept) return alert("請填寫姓名與單位");
+    applicantName = data.name; showStep(2); setTimeout(resizeCanvas, 150);
+    await apiFetch({ action: 'submitResume', resumeData: JSON.stringify(data) });
+  }
+  async function submitStep2() {
+    if(sig.isEmpty()) return alert("請完成簽署");
+    showStep(3); const res = await apiFetch({ action: 'getQuestions' }, true);
+    document.getElementById('examContainer').innerHTML = res.data.map((q, idx) => `
+      <div class="q-card"><p>Q${idx+1}. ${q.question}</p>
+        ${q.options.map((opt, i) => !opt ? '' : `<label class="opt-label"><input type="radio" name="q${q.id}" value="${i+1}" required>${i+1}. ${opt}</label>`).join('')}
+      </div>`).join('');
+    await apiFetch({ action: 'submitConsent', userName: applicantName, signatureData: sig.toDataURL() });
+  }
+  async function handleFinalSubmit() {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true; btn.innerText = "資料處理中...";
+    const answers = {}; document.querySelectorAll('#examContainer input:checked').forEach(r => answers[r.name.replace('q','')] = r.value);
+    const finalRes = await apiFetch({ action: 'submitAnswers', userName: applicantName, answers: JSON.stringify(answers) });
+    document.getElementById('scoreDisplay').innerText = finalRes.score; showStep(4);
+  }
+  function showStep(n) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.step-idx').forEach((s, i) => s.classList.toggle('active', i+1 === n));
+    document.getElementById('step'+n).classList.add('active'); window.scrollTo(0,0);
+  }
+</script>
 </body>
 </html>

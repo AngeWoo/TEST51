@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>招募數據決策中心 | HR Admin</title>
+  <style>
+    :root { --primary: #1a365d; --accent: #2b6cb0; --bg: #f7fafc; --gray: #718096; }
+    body { font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #2d3748; }
+    .dashboard { max-width: 1400px; margin: auto; background: white; border-radius: 12px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    
+    /* Header & Nav Buttons */
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #edf2f7; padding-bottom: 20px; margin-bottom: 25px; }
+    .nav-group { display: flex; gap: 10px; }
+    
+    .btn-nav { 
+      padding: 8px 18px; border-radius: 6px; border: 1px solid #ccc; background: white; 
+      cursor: pointer; font-size: 14px; font-weight: bold; text-decoration: none; color: #4a5568;
+      transition: 0.3s; display: inline-flex; align-items: center;
+    }
+    .btn-nav:hover { background: #f8fafc; border-color: var(--accent); color: var(--accent); }
+    .btn-logout { background: #fff1f0; color: #cf1322; border-color: #ffa39e; }
+    .btn-logout:hover { background: #fff1f0; border-color: #cf1322; color: #cf1322; }
+
+    /* Stats */
+    .stat-row { display: flex; gap: 20px; margin-bottom: 30px; }
+    .stat-card { flex: 1; background: #fff; padding: 15px 20px; border-radius: 10px; border-left: 5px solid var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .stat-value { font-size: 24px; font-weight: 800; color: var(--primary); }
+
+    /* Toolbar */
+    .toolbar { display: flex; gap: 15px; background: #edf2f7; padding: 15px; border-radius: 8px; margin-bottom: 20px; align-items: center; }
+    input, select { padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; }
+    
+    /* Table */
+    .table-container { background: white; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #f8fafc; padding: 15px 12px; text-align: left; border-bottom: 2px solid #e2e8f0; font-size: 13px; color: #4a5568; cursor: pointer; user-select: none; }
+    th.active-sort { background: #ebf8ff; color: var(--accent); }
+    .sort-icon { display: inline-block; margin-left: 5px; color: #cbd5e0; font-size: 10px; }
+    td { padding: 12px; border-bottom: 1px solid #edf2f7; font-size: 14px; }
+    tr:hover { background: #fdfdfd; }
+    .badge { padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; background: #ebf8ff; color: #2b6cb0; }
+    
+    /* Pagination */
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 30px; }
+    .page-btn { padding: 8px 16px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-weight: 600; }
+
+    /* Modals */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-content { background: white; padding: 35px; border-radius: 16px; width: 90%; max-width: 850px; max-height: 90vh; overflow-y: auto; position: relative; }
+    .close-btn { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; border: none; background: none; }
+    .detail-section-title { font-size: 16px; color: var(--accent); font-weight: 800; border-bottom: 2px solid #eee; padding-bottom: 8px; margin: 25px 0 15px; }
+    .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .detail-label { font-size: 11px; color: var(--gray); font-weight: bold; }
+    .detail-val { font-size: 15px; color: #2d3748; margin-top: 2px; }
+    .full-row { grid-column: span 3; background: #f8fafc; padding: 12px; border-radius: 6px; }
+    .sig-img { max-width: 320px; border: 1px solid #eee; border-radius: 8px; margin-top: 10px; }
+    .json-box { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; font-family: monospace; white-space: pre-wrap; font-size: 12px; }
+  </style>
+</head>
+<body>
+
+<div id="loginArea" style="text-align:center; padding: 100px;">
+  <div class="dashboard" style="max-width:350px;">
+    <h3>管理授權登入</h3><input type="password" id="pw" style="width:100%; margin-bottom:15px; box-sizing:border-box; padding:10px;" placeholder="密碼" onkeypress="if(event.keyCode==13) loadData()">
+    <button onclick="loadData()" style="width:100%; padding:10px; background:var(--accent); color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">登入</button>
+    <div style="margin-top:20px;"><a href="index.html" style="font-size:13px; color:var(--accent);">返回應徵首頁</a></div>
+  </div>
+</div>
+
+<div id="mainUI" class="dashboard" style="display:none;">
+  <div class="header">
+    <div>
+      <h2 style="margin:0;">應徵數據決策中心</h2>
+      <p style="color:var(--gray); margin:0; font-size:12px;">排序、分頁與詳細履歷調閱系統</p>
+    </div>
+    <div class="nav-group">
+      <!-- 新增：回首頁按鈕 -->
+      <a href="index.html" class="btn-nav">回首頁</a>
+      <button class="btn-nav btn-logout" onclick="location.reload()">安全登出</button>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card"><div>總人數</div><div id="t-count" class="stat-value">0</div></div>
+    <div class="stat-card"><div>平均得分</div><div id="t-avg" class="stat-value">0</div></div>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" id="searchName" placeholder="搜尋姓名..." oninput="handleSearch()" style="flex:1.5;">
+    <select id="filterDept" onchange="handleSearch()" style="flex:1;"><option value="">所有需求單位</option></select>
+    <select id="filterPos" onchange="handleSearch()" style="flex:1;"><option value="">所有應徵職務</option></select>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th onclick="triggerSort('originalIndex')">NO <span class="sort-icon" id="icon-originalIndex"></span></th>
+          <th onclick="triggerSort('name')">候選人 <span class="sort-icon" id="icon-name"></span></th>
+          <th onclick="triggerSort('dept')">需求單位 <span class="sort-icon" id="icon-dept"></span></th>
+          <th onclick="triggerSort('position')">應徵職務 <span class="sort-icon" id="icon-position"></span></th>
+          <th onclick="triggerSort('score')">分數 <span class="sort-icon" id="icon-score"></span></th>
+          <th onclick="triggerSort('timestamp')">時間 <span class="sort-icon" id="icon-timestamp"></span></th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="pagination">
+    <button class="page-btn" id="prevPage" onclick="changePage(-1)">上一頁</button>
+    <span id="pageInfo" style="font-size:14px; color:var(--gray);">第 1 / 1 頁</span>
+    <button class="page-btn" id="nextPage" onclick="changePage(1)">下一頁</button>
+  </div>
+</div>
+
+<!-- 詳細資料視窗 -->
+<div id="detailModal" class="modal"><div class="modal-content">
+  <button class="close-btn" onclick="closeModal('detailModal')">✕</button>
+  <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid var(--primary); padding-bottom:15px; margin-bottom:20px;">
+    <h2 id="m-name" style="margin:0; color:var(--primary);">候選人詳情</h2>
+    <div id="m-score-tag" class="badge" style="font-size:18px; padding:10px 20px;">0 分</div>
+  </div>
+  <div id="detail-loading" style="text-align:center; padding:40px;">讀取中...</div>
+  <div id="detail-body" style="display:none;">
+    <div class="detail-section-title">基本資訊</div>
+    <div class="detail-grid">
+      <div class="detail-item"><div class="detail-label">姓名</div><div class="detail-val" id="d-name"></div></div>
+      <div class="detail-item"><div class="detail-label">性別</div><div class="detail-val" id="d-gender"></div></div>
+      <div class="detail-item"><div class="detail-label">出生日期</div><div class="detail-val" id="d-birthday"></div></div>
+      <div class="detail-item"><div class="detail-label">聯絡電話</div><div class="detail-val" id="d-phone"></div></div>
+      <div class="detail-item"><div class="detail-label">電子郵件</div><div class="detail-val" id="d-email"></div></div>
+      <div class="detail-item"><div class="detail-label">需求單位</div><div class="detail-val" id="d-dept"></div></div>
+      <div class="detail-item"><div class="detail-label">考試日期時間</div><div class="detail-val" id="d-examTime" style="color:var(--accent); font-weight:bold;"></div></div>
+      <div class="detail-item full-row"><div class="detail-label">通訊地址</div><div class="detail-val" id="d-address"></div></div>
+    </div>
+    <div class="detail-section-title">專業背景</div>
+    <div class="detail-grid">
+      <div class="detail-item"><div class="detail-label">最高學歷</div><div class="detail-val" id="d-edu"></div></div>
+      <div class="detail-item"><div class="detail-label">畢業學校</div><div class="detail-val" id="d-school"></div></div>
+      <div class="detail-item"><div class="detail-label">科系</div><div class="detail-val" id="d-major"></div></div>
+      <div class="detail-item"><div class="detail-label">年資</div><div class="detail-val" id="d-expYears"></div></div>
+      <div class="detail-item"><div class="detail-label">應徵職務</div><div class="detail-val" id="d-job"></div></div>
+    </div>
+    <div class="detail-section-title">經歷自傳</div>
+    <div class="detail-grid">
+      <div class="detail-item full-row"><div class="detail-label">經歷簡述</div><div class="detail-val" id="d-expDetail"></div></div>
+      <div class="detail-item full-row"><div class="detail-label">專長技能</div><div class="detail-val" id="d-skills"></div></div>
+      <div class="detail-item full-row"><div class="detail-label">自我介紹</div><div class="detail-val" id="d-intro"></div></div>
+    </div>
+    <div class="detail-section-title">數位簽署</div>
+    <div style="text-align:center;"><img id="m-sig" class="sig-img" src=""></div>
+  </div>
+</div></div>
+
+<!-- JSON 匯入視窗 -->
+<div id="jsonModal" class="modal"><div class="modal-content" style="max-width:600px;">
+  <button class="close-btn" onclick="closeModal('jsonModal')">✕</button>
+  <h3>匯入 HR JSON</h3><div id="jsonDisplay" class="json-box"></div>
+  <button onclick="copyJson()" style="width:100%; margin-top:15px; padding:12px; background:var(--accent); color:white; border:none; border-radius:6px; cursor:pointer;">複製到剪貼簿</button>
+</div></div>
+
+<script>
+  const API_URL = "https://script.google.com/macros/s/AKfycbyQowSQ7CyUi44l5b3QXbkiEylN1TOeTUIxtirDOnbh1qbXH1YnZ3v0ylq2-kjsXQjxCQ/exec";
+  let rawData = [], filteredData = [], currentPw = "";
+  const pageSize = 201; let currentPage = 1; let currentSort = { key: 'originalIndex', dir: 'asc' };
+
+  const fmtDate = (val) => {
+    if(!val) return '---';
+    const d = new Date(val);
+    if(isNaN(d)) return val;
+    return d.getFullYear() + '/' + (d.getMonth()+1).toString().padStart(2,'0') + '/' + d.getDate().toString().padStart(2,'0');
+  };
+
+  async function loadData() {
+    currentPw = document.getElementById('pw').value;
+    try {
+      const res = await (await fetch(`${API_URL}?action=getResults&password=${encodeURIComponent(currentPw)}`)).json();
+      if(res.success) {
+        rawData = res.data.map((item, index) => ({ 
+            ...item, 
+            originalIndex: index + 1, 
+            score: parseFloat(item.score) || 0,
+            timestamp: String(item.timestamp).slice(0, 16) 
+        }));
+        document.getElementById('loginArea').style.display = 'none'; document.getElementById('mainUI').style.display = 'block';
+        
+        const depts = [...new Set(rawData.map(r => r.dept))];
+        document.getElementById('filterDept').innerHTML = '<option value="">所有需求單位</option>' + depts.map(d => `<option value="${d}">${d}</option>`).join('');
+        
+        const jobs = [...new Set(rawData.map(r => r.position))];
+        document.getElementById('filterPos').innerHTML = '<option value="">所有應徵職務</option>' + jobs.map(j => `<option value="${j}">${j}</option>`).join('');
+        
+        handleSearch();
+      } else alert("密碼錯誤");
+    } catch(e) { alert("API 連線失敗"); }
+  }
+
+  function handleSearch() {
+    const name = document.getElementById('searchName').value.toLowerCase();
+    const dept = document.getElementById('filterDept').value;
+    const pos = document.getElementById('filterPos').value;
+    filteredData = rawData.filter(r => String(r.name).toLowerCase().includes(name) && (!dept || r.dept === dept) && (!pos || r.position === pos));
+    currentPage = 1; executeSort();
+  }
+
+  function triggerSort(key) {
+    if (currentSort.key === key) currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+    else { currentSort.key = key; currentSort.dir = 'asc'; }
+    executeSort();
+  }
+
+  function executeSort() {
+    const dir = currentSort.dir === 'asc' ? 1 : -1;
+    filteredData.sort((a, b) => {
+      let vA = a[currentSort.key], vB = b[currentSort.key];
+      if (typeof vA === 'number') return (vA - vB) * dir;
+      if (currentSort.key === 'timestamp') return (new Date(vA) - new Date(vB)) * dir;
+      return String(vA || "").localeCompare(String(vB || ""), 'zh-Hant') * dir;
+    });
+    ['originalIndex', 'name', 'dept', 'position', 'score', 'timestamp'].forEach(k => {
+      const icon = document.getElementById(`icon-${k}`); if(!icon) return;
+      icon.innerText = currentSort.key === k ? (currentSort.dir === 'asc' ? ' ▲' : ' ▼') : '';
+      icon.parentElement.classList.toggle('active-sort', currentSort.key === k);
+    });
+    render();
+  }
+
+  function render() {
+    const start = (currentPage - 1) * pageSize; const items = filteredData.slice(start, start + pageSize);
+    document.getElementById('tbody').innerHTML = items.map(r => `
+      <tr><td>${r.originalIndex}</td><td><strong>${r.name}</strong></td><td>${r.dept}</td><td>${r.position}</td>
+        <td><span class="badge" style="background:${r.score >= 80 ? '#c6f6d5':'#ebf8ff'}">${r.score}</span></td><td>${r.timestamp}</td>
+        <td><button onclick="viewProfile('${r.name}')" class="page-btn" style="padding:4px 8px;font-size:12px;cursor:pointer;">詳情</button>
+            <button onclick="importHR('${r.name}')" class="page-btn" style="padding:4px 8px;font-size:12px;background:#4a5568;color:white;cursor:pointer;">匯入</button></td></tr>`).join('');
+    
+    document.getElementById('t-count').innerText = filteredData.length + " 人";
+    const avg = filteredData.length ? (filteredData.reduce((acc, c) => acc + c.score, 0) / filteredData.length).toFixed(1) : 0;
+    document.getElementById('t-avg').innerText = avg + " 分";
+    
+    const max = Math.ceil(filteredData.length / pageSize) || 1;
+    document.getElementById('pageInfo').innerText = `第 ${currentPage} / ${max} 頁`;
+    document.getElementById('prevPage').disabled = currentPage === 1; document.getElementById('nextPage').disabled = currentPage === max;
+  }
+
+  function changePage(offset) { currentPage += offset; render(); window.scrollTo(0,0); }
+
+  async function viewProfile(name) {
+    document.getElementById('detailModal').style.display = 'flex';
+    document.getElementById('detail-loading').style.display = 'block';
+    document.getElementById('detail-body').style.display = 'none';
+    const res = await (await fetch(`${API_URL}?action=getFullCandidateInfo&password=${encodeURIComponent(currentPw)}&userName=${encodeURIComponent(name)}`)).json();
+    if(res.success) {
+      const d = res.data; const r = d.resumeArray;
+      document.getElementById('m-name').innerText = `候選人：${name}`;
+      document.getElementById('m-score-tag').innerText = d.score + ' 分';
+      document.getElementById('m-score-tag').style.background = d.score >= 80 ? '#c6f6d5':'#ebf8ff';
+      document.getElementById('d-name').innerText = r[1] || '---';
+      document.getElementById('d-gender').innerText = r[2] || '---';
+      document.getElementById('d-birthday').innerText = fmtDate(r[3]);
+      document.getElementById('d-phone').innerText = r[4] || '---';
+      document.getElementById('d-email').innerText = r[5] || '---';
+      document.getElementById('d-address').innerText = r[6] || '---';
+      document.getElementById('d-edu').innerText = r[7] || '---';
+      document.getElementById('d-school').innerText = r[8] || '---';
+      document.getElementById('d-major').innerText = r[9] || '---';
+      document.getElementById('d-expYears').innerText = (r[10] || '0') + ' 年';
+      document.getElementById('d-job').innerText = r[11] || '---';
+      document.getElementById('d-expDetail').innerText = r[12] || '---';
+      document.getElementById('d-skills').innerText = r[13] || '---';
+      document.getElementById('d-intro').innerText = r[14] || '---';
+      document.getElementById('d-dept').innerText = r[15] || '---';
+      document.getElementById('d-examTime').innerText = d.timestamp || '---';
+      document.getElementById('m-sig').src = d.signature || "";
+      document.getElementById('detail-loading').style.display = 'none';
+      document.getElementById('detail-body').style.display = 'block';
+    }
+  }
+
+  async function importHR(name) {
+    document.getElementById('jsonModal').style.display = 'flex';
+    const res = await (await fetch(`${API_URL}?action=getFullCandidateInfo&password=${encodeURIComponent(currentPw)}&userName=${encodeURIComponent(name)}`)).json();
+    if(res.success) {
+        const r = res.data.resumeArray;
+        const out = { candidate: { name: r[1], gender: r[2], birthday: fmtDate(r[3]), phone: r[4], email: r[5], edu: r[7], school: r[8], job: r[11], dept: r[15], exam_time: res.data.timestamp, import_at: new Date().toISOString() }, score: res.data.score };
+        document.getElementById('jsonDisplay').innerText = JSON.stringify(out, null, 2);
+    }
+  }
+  
+  function copyJson() { navigator.clipboard.writeText(document.getElementById('jsonDisplay').innerText).then(() => alert("JSON 已複製")); }
+  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+</script>
+</body>
+</html>
