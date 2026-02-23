@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>面試官評分系統 | Interview Scoring</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap');
+
+    :root {
+      --primary: #991b1b; --accent: #ef4444; --bg: #fdf2f2;
+      --card-border: #fee2e2; --shadow-3d: 0 10px 25px -5px rgba(153, 27, 27, 0.15);
+      --btn-shadow: 0 6px 0 #b91c1c;
+      --gold: #f59e0b; --gold-light: #fef3c7;
+    }
+
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', 'Noto Sans TC', sans-serif; background: var(--bg); margin: 0; padding: 30px 15px; color: #1e293b; font-size: 18px; }
+
+    .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 30px; box-shadow: 0 30px 60px -12px rgba(153, 27, 27, 0.15); overflow: hidden; border: 1px solid var(--card-border); }
+
+    .header { background: linear-gradient(135deg, #ef4444, #991b1b); color: white; padding: 40px 30px; text-align: center; }
+    .header h1 { margin: 0; font-size: 28px; font-weight: 900; }
+    .header p { margin: 8px 0 0; opacity: 0.85; font-size: 15px; }
+
+    .content { padding: 30px; }
+
+    /* === Login === */
+    #loginArea { padding: 60px 30px; text-align: center; }
+    .login-card { max-width: 400px; margin: 0 auto; }
+    .login-card h2 { font-size: 28px; font-weight: 900; color: var(--primary); margin-bottom: 30px; }
+    .login-card .pw-wrap { position: relative; margin-bottom: 15px; }
+    .login-card .pw-wrap input[type="password"], .login-card .pw-wrap input[type="text"] { width: 100%; height: 65px; border: 2px solid #e2e8f0; border-radius: 18px; font-size: 22px; text-align: center; padding: 0 50px 0 20px; margin: 0; }
+    .login-card .pw-wrap input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(239,68,68,0.15); }
+    .login-card .pw-wrap .pw-toggle { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 22px; color: #94a3b8; padding: 5px; width: auto; height: auto; }
+    .login-card .pw-wrap .pw-toggle:active { transform: translateY(-50%); }
+    .login-card .remember-label { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 14px; color: #64748b; cursor: pointer; user-select: none; }
+    .login-card .remember-label input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+    .login-card button.login-main-btn { width: 100%; height: 65px; background: var(--accent); color: white; border: none; border-radius: 18px; font-size: 22px; font-weight: 900; cursor: pointer; box-shadow: var(--btn-shadow); transition: 0.1s; }
+    .login-card button.login-main-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #b91c1c; }
+    .login-card button.login-main-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .login-error { color: var(--accent); font-weight: 700; margin-top: 10px; display: none; }
+
+    #mainUI { display: none; }
+
+    /* === Search === */
+    .search-section { margin-bottom: 25px; }
+    .search-section h3 { color: var(--primary); font-weight: 900; margin: 0 0 15px; font-size: 20px; border-left: 6px solid var(--accent); padding-left: 12px; }
+    .search-input-wrap { position: relative; }
+    .search-input-wrap input { width: 100%; padding: 16px 20px; border: 2px solid #e2e8f0; border-radius: 15px; font-size: 18px; }
+    .search-input-wrap input:focus { border-color: var(--accent); outline: none; }
+    .search-results { margin-top: 15px; max-height: 300px; overflow-y: auto; }
+    .candidate-card { background: #fffafa; padding: 18px 20px; border-radius: 15px; border: 2px solid var(--card-border); margin-bottom: 10px; cursor: pointer; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; }
+    .candidate-card:hover { border-color: var(--accent); background: #fff5f5; transform: translateY(-2px); }
+    .candidate-card.selected { border-color: var(--primary); background: #fef2f2; box-shadow: 0 0 0 3px rgba(153,27,27,0.15); }
+    .candidate-card .name { font-weight: 900; font-size: 18px; color: var(--primary); }
+    .candidate-card .meta { font-size: 14px; color: #64748b; margin-top: 4px; }
+    .candidate-card .score-badge { background: var(--primary); color: white; padding: 6px 14px; border-radius: 10px; font-weight: 900; font-size: 16px; white-space: nowrap; }
+    .no-results { text-align: center; padding: 30px; color: #94a3b8; font-weight: 700; }
+
+    /* === Selected Info === */
+    .selected-info { background: linear-gradient(135deg, #fef2f2, #fff5f5); padding: 20px 25px; border-radius: 20px; border: 2px solid var(--primary); margin-bottom: 25px; display: none; }
+    .selected-info .title { font-weight: 900; color: var(--primary); font-size: 20px; }
+    .selected-info .details { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 8px; font-size: 15px; color: #475569; }
+    .selected-info .tag { background: white; padding: 4px 12px; border-radius: 8px; font-weight: 700; }
+
+    /* === Star Rating === */
+    .section-title { font-size: 22px; color: var(--primary); font-weight: 900; border-left: 6px solid var(--accent); padding-left: 12px; margin: 30px 0 20px; }
+
+    .rating-card { background: #fffafa; padding: 22px 25px; border-radius: 18px; border: 1px solid var(--card-border); box-shadow: var(--shadow-3d); margin-bottom: 15px; }
+    .rating-card .dim-label { font-weight: 900; font-size: 17px; color: var(--primary); margin-bottom: 3px; }
+    .rating-card .dim-sub { font-size: 13px; color: #94a3b8; margin-bottom: 12px; }
+
+    .star-group { display: flex; gap: 8px; }
+    .star-group input { display: none; }
+    .star-group label {
+      font-size: 36px; cursor: pointer; color: #d1d5db; transition: 0.15s;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      user-select: none; -webkit-user-select: none;
+    }
+    .star-group label:hover,
+    .star-group label:hover ~ label { color: var(--gold); }
+    .star-group input:checked ~ label { color: #d1d5db; }
+    .star-group input:checked + label,
+    .star-group input:checked + label ~ .star-checked { color: var(--gold); }
+
+    /* 反轉 flexbox 讓 CSS 能選到前面的星星 */
+    .star-group { flex-direction: row-reverse; justify-content: flex-end; }
+    .star-group label:hover,
+    .star-group label:hover ~ label { color: var(--gold); }
+    .star-group input:checked + label,
+    .star-group input:checked + label ~ label { color: var(--gold); }
+
+    .rating-card.invalid { border: 2px solid var(--accent); }
+    .star-value { font-size: 14px; color: var(--gold); font-weight: 900; margin-left: 10px; min-width: 30px; }
+
+    /* === Recommendation === */
+    .rec-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+    .rec-option { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-radius: 15px; border: 2px solid #e2e8f0; cursor: pointer; transition: 0.2s; font-weight: 800; font-size: 16px; }
+    .rec-option:hover { border-color: var(--accent); }
+    .rec-option input { width: 22px; height: 22px; accent-color: var(--primary); }
+    .rec-option.rec-strong { border-color: #dcfce7; background: #f0fdf4; }
+    .rec-option.rec-strong:has(input:checked) { border-color: #22c55e; background: #dcfce7; }
+    .rec-option.rec-yes { border-color: #dbeafe; background: #eff6ff; }
+    .rec-option.rec-yes:has(input:checked) { border-color: #3b82f6; background: #dbeafe; }
+    .rec-option.rec-maybe { border-color: #ffedd5; background: #fff7ed; }
+    .rec-option.rec-maybe:has(input:checked) { border-color: #f97316; background: #ffedd5; }
+    .rec-option.rec-no { border-color: #fee2e2; background: #fef2f2; }
+    .rec-option.rec-no:has(input:checked) { border-color: #ef4444; background: #fee2e2; }
+
+    /* === Form Inputs === */
+    label.form-label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 16px; color: #475569; }
+    input.form-input, textarea.form-input {
+      width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px;
+      font-size: 17px; font-family: inherit; transition: border-color 0.2s;
+    }
+    input.form-input:focus, textarea.form-input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
+    textarea.form-input { resize: vertical; min-height: 120px; }
+
+    .form-group { margin-bottom: 20px; }
+
+    /* === Submit === */
+    .btn-submit { background: var(--accent); color: white; border: none; padding: 20px; border-radius: 18px; font-weight: 900; cursor: pointer; width: 100%; font-size: 22px; margin-top: 25px; box-shadow: var(--btn-shadow); transition: 0.1s; }
+    .btn-submit:active { transform: translateY(4px); box-shadow: 0 2px 0 #b91c1c; }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-submit .spinner { display: inline-block; width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 0.8s ease infinite; margin-right: 8px; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg { color: var(--accent); font-weight: 700; font-size: 14px; text-align: center; margin-top: 10px; display: none; }
+
+    /* === Success === */
+    .success-panel { display: none; text-align: center; padding: 50px 20px; }
+    .success-panel .check { font-size: 80px; color: #22c55e; }
+    .success-panel h2 { color: var(--primary); font-size: 28px; font-weight: 900; }
+    .success-panel .avg-score { font-size: 50px; font-weight: 900; color: var(--gold); }
+
+    /* === Footer === */
+    .footer { text-align: center; padding: 25px; background: #fffafa; border-top: 1px solid var(--card-border); }
+    .footer a { color: var(--accent); text-decoration: none; font-weight: 700; margin: 0 15px; font-size: 15px; }
+
+    /* === Toast === */
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 25px; border-radius: 15px; font-size: 14px; font-weight: 700; z-index: 3000; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+    .toast.success { background: #22c55e; }
+    .toast.error { background: #ef4444; }
+
+    @media (max-width: 768px) {
+      body { padding: 15px 10px; }
+      .content { padding: 20px; }
+      .header h1 { font-size: 22px; }
+      .rec-group { grid-template-columns: 1fr; }
+      .star-group label { font-size: 30px; }
+      .candidate-card { flex-direction: column; align-items: flex-start; gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="container">
+  <div class="header">
+    <h1>面試官評分系統</h1>
+    <p>Interviewer Scoring System</p>
+  </div>
+
+  <div class="content">
+    <!-- === LOGIN === -->
+    <div id="loginArea">
+      <div class="login-card">
+        <h2>面試官身份驗證</h2>
+        <div class="pw-wrap">
+          <input type="password" id="pw" placeholder="輸入面試官密碼" onkeypress="if(event.keyCode===13) doLogin()" autocomplete="current-password" aria-label="面試官密碼">
+          <button type="button" class="pw-toggle" onclick="togglePwView()" title="顯示/隱藏密碼">👁</button>
+        </div>
+        <label class="remember-label">
+          <input type="checkbox" id="rememberPw"> 記住密碼
+        </label>
+        <button id="loginBtn" class="login-main-btn" onclick="doLogin()">開始評分</button>
+        <div class="login-error" id="loginError"></div>
+      </div>
+    </div>
+
+    <!-- === MAIN UI === -->
+    <div id="mainUI">
+      <!-- Search -->
+      <div class="search-section">
+        <h3>搜尋候選人</h3>
+        <div class="search-input-wrap">
+          <input type="text" id="searchInput" placeholder="輸入候選人姓名或追蹤碼..." oninput="doSearch()" aria-label="搜尋候選人">
+        </div>
+        <div class="search-results" id="searchResults">
+          <div class="no-results">請輸入關鍵字搜尋候選人</div>
+        </div>
+      </div>
+
+      <!-- Selected Candidate -->
+      <div class="selected-info" id="selectedInfo">
+        <div class="title" id="selName"></div>
+        <div class="details">
+          <span class="tag" id="selDept"></span>
+          <span class="tag" id="selPos"></span>
+          <span class="tag" id="selScore"></span>
+          <span class="tag" id="selAppId" style="font-family:monospace; font-size:12px;"></span>
+        </div>
+      </div>
+
+      <!-- Scoring Form (hidden until candidate selected) -->
+      <div id="scoringForm" style="display:none;">
+        <div class="section-title">面試評分（每項 1-5 星）</div>
+
+        <div class="rating-card" id="rc-professional">
+          <div class="dim-label">專業能力</div>
+          <div class="dim-sub">Professional Skills — 工作相關知識、技術深度、實務經驗</div>
+          <div style="display:flex; align-items:center;">
+            <div class="star-group" data-dim="professional">
+              <input type="radio" name="professional" value="5" id="p5"><label for="p5">&#9733;</label>
+              <input type="radio" name="professional" value="4" id="p4"><label for="p4">&#9733;</label>
+              <input type="radio" name="professional" value="3" id="p3"><label for="p3">&#9733;</label>
+              <input type="radio" name="professional" value="2" id="p2"><label for="p2">&#9733;</label>
+              <input type="radio" name="professional" value="1" id="p1"><label for="p1">&#9733;</label>
+            </div>
+            <span class="star-value" id="val-professional">-</span>
+          </div>
+        </div>
+
+        <div class="rating-card" id="rc-communication">
+          <div class="dim-label">溝通表達</div>
+          <div class="dim-sub">Communication — 口語表達、邏輯清晰度、傾聽能力</div>
+          <div style="display:flex; align-items:center;">
+            <div class="star-group" data-dim="communication">
+              <input type="radio" name="communication" value="5" id="c5"><label for="c5">&#9733;</label>
+              <input type="radio" name="communication" value="4" id="c4"><label for="c4">&#9733;</label>
+              <input type="radio" name="communication" value="3" id="c3"><label for="c3">&#9733;</label>
+              <input type="radio" name="communication" value="2" id="c2"><label for="c2">&#9733;</label>
+              <input type="radio" name="communication" value="1" id="c1"><label for="c1">&#9733;</label>
+            </div>
+            <span class="star-value" id="val-communication">-</span>
+          </div>
+        </div>
+
+        <div class="rating-card" id="rc-teamwork">
+          <div class="dim-label">團隊協作</div>
+          <div class="dim-sub">Teamwork — 合作意願、協調能力、衝突處理</div>
+          <div style="display:flex; align-items:center;">
+            <div class="star-group" data-dim="teamwork">
+              <input type="radio" name="teamwork" value="5" id="t5"><label for="t5">&#9733;</label>
+              <input type="radio" name="teamwork" value="4" id="t4"><label for="t4">&#9733;</label>
+              <input type="radio" name="teamwork" value="3" id="t3"><label for="t3">&#9733;</label>
+              <input type="radio" name="teamwork" value="2" id="t2"><label for="t2">&#9733;</label>
+              <input type="radio" name="teamwork" value="1" id="t1"><label for="t1">&#9733;</label>
+            </div>
+            <span class="star-value" id="val-teamwork">-</span>
+          </div>
+        </div>
+
+        <div class="rating-card" id="rc-potential">
+          <div class="dim-label">學習潛力</div>
+          <div class="dim-sub">Learning Potential — 成長意願、適應力、自我驅動力</div>
+          <div style="display:flex; align-items:center;">
+            <div class="star-group" data-dim="potential">
+              <input type="radio" name="potential" value="5" id="l5"><label for="l5">&#9733;</label>
+              <input type="radio" name="potential" value="4" id="l4"><label for="l4">&#9733;</label>
+              <input type="radio" name="potential" value="3" id="l3"><label for="l3">&#9733;</label>
+              <input type="radio" name="potential" value="2" id="l2"><label for="l2">&#9733;</label>
+              <input type="radio" name="potential" value="1" id="l1"><label for="l1">&#9733;</label>
+            </div>
+            <span class="star-value" id="val-potential">-</span>
+          </div>
+        </div>
+
+        <div class="rating-card" id="rc-stability">
+          <div class="dim-label">工作穩定度</div>
+          <div class="dim-sub">Stability — 留任意願、職涯規劃、抗壓能力</div>
+          <div style="display:flex; align-items:center;">
+            <div class="star-group" data-dim="stability">
+              <input type="radio" name="stability" value="5" id="s5"><label for="s5">&#9733;</label>
+              <input type="radio" name="stability" value="4" id="s4"><label for="s4">&#9733;</label>
+              <input type="radio" name="stability" value="3" id="s3"><label for="s3">&#9733;</label>
+              <input type="radio" name="stability" value="2" id="s2"><label for="s2">&#9733;</label>
+              <input type="radio" name="stability" value="1" id="s1"><label for="s1">&#9733;</label>
+            </div>
+            <span class="star-value" id="val-stability">-</span>
+          </div>
+        </div>
+
+        <!-- Recommendation -->
+        <div class="section-title">錄用建議</div>
+        <div class="rec-group" id="recGroup">
+          <label class="rec-option rec-strong"><input type="radio" name="recommendation" value="強烈推薦">強烈推薦</label>
+          <label class="rec-option rec-yes"><input type="radio" name="recommendation" value="推薦">推薦</label>
+          <label class="rec-option rec-maybe"><input type="radio" name="recommendation" value="待議">待議</label>
+          <label class="rec-option rec-no"><input type="radio" name="recommendation" value="不推薦">不推薦</label>
+        </div>
+
+        <!-- Interviewer Info -->
+        <div class="section-title">面試官資訊</div>
+        <div class="form-group">
+          <label class="form-label" for="interviewerName">面試官姓名 <span style="color:#ef4444">*</span></label>
+          <input type="text" id="interviewerName" class="form-input" required maxlength="50" placeholder="請輸入您的姓名">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="interviewNotes">面試備註</label>
+          <textarea id="interviewNotes" class="form-input" maxlength="3000" placeholder="記錄面試中的關鍵觀察、特殊表現或需注意事項..."></textarea>
+        </div>
+
+        <div class="error-msg" id="formError"></div>
+        <button class="btn-submit" id="submitBtn" onclick="submitInterview()">提交面試評分</button>
+      </div>
+
+      <!-- Success Panel -->
+      <div class="success-panel" id="successPanel">
+        <div class="check">&#10003;</div>
+        <h2>評分提交成功</h2>
+        <p style="color:#64748b;">面試評分均分</p>
+        <div class="avg-score" id="avgScoreDisplay">0</div>
+        <button class="btn-submit" style="max-width:300px; margin:30px auto 0; font-size:18px;" onclick="resetForm()">繼續評分下一位</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <a href="index.html">應徵首頁</a>
+    <a href="admin.html">管理後台</a>
+  </div>
+</div>
+
+<script>
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbyQowSQ7CyUi44l5b3QXbkiEylN1TOeTUIxtirDOnbh1qbXH1YnZ3v0ylq2-kjsXQjxCQ/exec";
+  let currentPw = '';
+  let selectedCandidate = null;
+  let allCandidates = [];
+
+  // === Utility ===
+  function escapeHtml(str) {
+    if (str == null) return '---';
+    const div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+  }
+
+  function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + (type || '');
+    setTimeout(() => t.className = 'toast', 3000);
+  }
+
+  function setLoading(btn, loading, text) {
+    if (loading) {
+      btn.disabled = true;
+      btn.dataset.orig = btn.textContent;
+      btn.innerHTML = '<span class="spinner"></span>' + (text || '處理中...');
+    } else {
+      btn.disabled = false;
+      btn.textContent = btn.dataset.orig || text || '提交';
+    }
+  }
+
+  // === Password View & Remember ===
+  function togglePwView() {
+    const inp = document.getElementById('pw');
+    const btn = inp.parentElement.querySelector('.pw-toggle');
+    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+    else { inp.type = 'password'; btn.textContent = '👁'; }
+  }
+  (function loadSavedPw() {
+    const saved = localStorage.getItem('interview_pw');
+    if (saved) {
+      document.getElementById('pw').value = saved;
+      document.getElementById('rememberPw').checked = true;
+    }
+  })();
+
+  // === Login ===
+  async function doLogin() {
+    const pwInput = document.getElementById('pw');
+    const btn = document.getElementById('loginBtn');
+    const err = document.getElementById('loginError');
+    currentPw = pwInput.value;
+    if (!currentPw) { err.textContent = '請輸入密碼'; err.style.display = 'block'; return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner" style="display:inline-block;width:24px;height:24px;border:3px solid rgba(255,255,255,0.3);border-radius:50%;border-top-color:white;animation:spin 0.8s ease infinite;vertical-align:middle;"></span>';
+    err.style.display = 'none';
+
+    try {
+      const res = await (await fetch(GAS_URL + '?action=searchCandidates&password=' + encodeURIComponent(currentPw) + '&query=')).json();
+      if (res.success) {
+        if (document.getElementById('rememberPw').checked) {
+          localStorage.setItem('interview_pw', currentPw);
+        } else {
+          localStorage.removeItem('interview_pw');
+        }
+        allCandidates = res.data;
+        document.getElementById('loginArea').style.display = 'none';
+        document.getElementById('mainUI').style.display = 'block';
+      } else {
+        err.textContent = '密碼錯誤';
+        err.style.display = 'block';
+        pwInput.value = '';
+        pwInput.focus();
+      }
+    } catch (e) {
+      err.textContent = '連線失敗，請檢查網路';
+      err.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '開始評分';
+    }
+  }
+
+  // === Search ===
+  let searchTimer;
+  function doSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(executeSearch, 300);
+  }
+
+  function executeSearch() {
+    const query = document.getElementById('searchInput').value.trim().toLowerCase();
+    const container = document.getElementById('searchResults');
+
+    if (!query) {
+      container.innerHTML = '<div class="no-results">請輸入關鍵字搜尋候選人</div>';
+      return;
+    }
+
+    const results = allCandidates.filter(c =>
+      c.name.toLowerCase().includes(query) ||
+      (c.applicationId && c.applicationId.toLowerCase().includes(query))
+    );
+
+    if (results.length === 0) {
+      container.innerHTML = '<div class="no-results">找不到符合的候選人</div>';
+      return;
+    }
+
+    container.innerHTML = results.map((c, i) =>
+      '<div class="candidate-card' + (selectedCandidate && selectedCandidate.name === c.name && selectedCandidate.applicationId === c.applicationId ? ' selected' : '') + '" onclick="selectCandidate(' + i + ')" data-idx="' + i + '">' +
+        '<div><div class="name">' + escapeHtml(c.name) + '</div>' +
+        '<div class="meta">' + escapeHtml(c.dept) + ' · ' + escapeHtml(c.position) +
+        (c.applicationId ? ' · <span style="font-family:monospace">' + escapeHtml(c.applicationId) + '</span>' : '') + '</div></div>' +
+        '<div class="score-badge">測驗 ' + c.examScore + ' 分</div>' +
+      '</div>'
+    ).join('');
+
+    // Store filtered results for selection
+    container._filteredResults = results;
+  }
+
+  function selectCandidate(idx) {
+    const container = document.getElementById('searchResults');
+    const results = container._filteredResults || allCandidates;
+    selectedCandidate = results[idx];
+
+    // Update selected info
+    document.getElementById('selectedInfo').style.display = 'block';
+    document.getElementById('selName').textContent = selectedCandidate.name;
+    document.getElementById('selDept').textContent = selectedCandidate.dept;
+    document.getElementById('selPos').textContent = selectedCandidate.position;
+    document.getElementById('selScore').textContent = '測驗 ' + selectedCandidate.examScore + ' 分';
+    document.getElementById('selAppId').textContent = selectedCandidate.applicationId || '';
+
+    // Show scoring form
+    document.getElementById('scoringForm').style.display = 'block';
+    document.getElementById('successPanel').style.display = 'none';
+
+    // Highlight selected card
+    container.querySelectorAll('.candidate-card').forEach(card => card.classList.remove('selected'));
+    const clickedCard = container.querySelector('[data-idx="' + idx + '"]');
+    if (clickedCard) clickedCard.classList.add('selected');
+
+    // Scroll to scoring form
+    document.getElementById('scoringForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // === Star Rating Events ===
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.star-group input').forEach(input => {
+      input.addEventListener('change', function() {
+        const dim = this.name;
+        document.getElementById('val-' + dim).textContent = this.value + ' 分';
+        document.getElementById('rc-' + dim).classList.remove('invalid');
+      });
+    });
+  });
+
+  // === Submit ===
+  async function submitInterview() {
+    const btn = document.getElementById('submitBtn');
+    const errEl = document.getElementById('formError');
+    errEl.style.display = 'none';
+
+    if (!selectedCandidate) { errEl.textContent = '請先選擇候選人'; errEl.style.display = 'block'; return; }
+
+    // Validate scores
+    const dims = ['professional', 'communication', 'teamwork', 'potential', 'stability'];
+    const scores = {};
+    let allRated = true;
+    dims.forEach(dim => {
+      const checked = document.querySelector('input[name="' + dim + '"]:checked');
+      if (checked) {
+        scores[dim] = parseInt(checked.value);
+        document.getElementById('rc-' + dim).classList.remove('invalid');
+      } else {
+        allRated = false;
+        document.getElementById('rc-' + dim).classList.add('invalid');
+      }
+    });
+    if (!allRated) {
+      errEl.textContent = '請完成所有評分維度';
+      errEl.style.display = 'block';
+      document.querySelector('.rating-card.invalid').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    // Validate recommendation
+    const rec = document.querySelector('input[name="recommendation"]:checked');
+    if (!rec) { errEl.textContent = '請選擇錄用建議'; errEl.style.display = 'block'; return; }
+
+    // Validate interviewer name
+    const interviewerName = document.getElementById('interviewerName').value.trim();
+    if (!interviewerName) {
+      errEl.textContent = '請輸入面試官姓名';
+      errEl.style.display = 'block';
+      document.getElementById('interviewerName').focus();
+      return;
+    }
+
+    const notes = document.getElementById('interviewNotes').value.trim();
+
+    setLoading(btn, true, '提交中...');
+
+    try {
+      const res = await (await fetch(GAS_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'submitInterview',
+          interviewerPassword: currentPw,
+          applicationId: selectedCandidate.applicationId || '',
+          candidateName: selectedCandidate.name,
+          interviewerName: interviewerName,
+          scores: JSON.stringify(scores),
+          recommendation: rec.value,
+          notes: notes
+        })
+      })).json();
+
+      if (res.success) {
+        document.getElementById('scoringForm').style.display = 'none';
+        document.getElementById('successPanel').style.display = 'block';
+        document.getElementById('avgScoreDisplay').textContent = res.totalAvg;
+        showToast('評分提交成功！', 'success');
+        document.getElementById('successPanel').scrollIntoView({ behavior: 'smooth' });
+      } else {
+        throw new Error(res.message || '提交失敗');
+      }
+    } catch (e) {
+      errEl.textContent = '提交失敗：' + e.message;
+      errEl.style.display = 'block';
+    } finally {
+      setLoading(btn, false, '提交面試評分');
+    }
+  }
+
+  function resetForm() {
+    selectedCandidate = null;
+    document.getElementById('selectedInfo').style.display = 'none';
+    document.getElementById('scoringForm').style.display = 'none';
+    document.getElementById('successPanel').style.display = 'none';
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchResults').innerHTML = '<div class="no-results">請輸入關鍵字搜尋候選人</div>';
+
+    // Reset all ratings
+    document.querySelectorAll('.star-group input').forEach(i => i.checked = false);
+    ['professional','communication','teamwork','potential','stability'].forEach(d => {
+      document.getElementById('val-' + d).textContent = '-';
+      document.getElementById('rc-' + d).classList.remove('invalid');
+    });
+    document.querySelectorAll('input[name="recommendation"]').forEach(i => i.checked = false);
+    document.getElementById('interviewNotes').value = '';
+    document.getElementById('formError').style.display = 'none';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>

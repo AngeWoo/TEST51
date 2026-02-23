@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>面試排程看板 | Interview Schedule</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+
+    :root {
+      --primary: #991b1b; --accent: #ef4444; --bg: #f8fafc;
+      --card-border: #fee2e2; --shadow-3d: 0 10px 25px -5px rgba(153, 27, 27, 0.15);
+      --btn-inset: inset 0 -4px 0 rgba(0,0,0,0.2);
+    }
+
+    * { box-sizing: border-box; }
+    body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #1e293b; font-size: 16px; }
+    .app-container { max-width: 1400px; margin: 0 auto; width: 100%; }
+
+    /* --- Login --- */
+    #loginArea { display: flex; justify-content: center; align-items: center; min-height: 85vh; width: 100%; }
+    .login-card { background: white; padding: 60px 45px; border-radius: 30px; box-shadow: 0 30px 60px -12px rgba(153,27,27,0.25); width: 100%; max-width: 500px; text-align: center; border: 1px solid #fee2e2; }
+    .login-card h2 { font-size: 34px; font-weight: 900; color: var(--primary); margin-bottom: 10px; }
+    .login-card .sub { color: #64748b; font-size: 14px; margin-bottom: 35px; }
+    .login-card input[type="password"], .login-card input[type="text"]#pw { width: 100%; height: 70px; border: 2px solid #e2e8f0; border-radius: 20px; font-size: 22px; text-align: center; margin-bottom: 0; padding: 0 50px 0 20px; }
+    .login-card input[type="password"]:focus, .login-card input[type="text"]#pw:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(239,68,68,0.15); }
+    .login-card .pw-wrap { position: relative; margin-bottom: 15px; }
+    .login-card .pw-wrap .pw-toggle { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 22px; color: #94a3b8; padding: 5px; width: auto; height: auto; box-shadow: none; }
+    .login-card .pw-wrap .pw-toggle:active { transform: translateY(-50%); box-shadow: none; }
+    .login-card .remember-label { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 14px; color: #64748b; cursor: pointer; user-select: none; }
+    .login-card .remember-label input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; border: none; margin: 0; padding: 0; }
+    .login-card button.login-main-btn { width: 100%; height: 70px; background: var(--accent); color: white; border: none; border-radius: 20px; font-size: 22px; font-weight: bold; cursor: pointer; box-shadow: 0 6px 0 #b91c1c; }
+    .login-card button.login-main-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #b91c1c; }
+    .login-card button.login-main-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .login-error { color: var(--accent); font-weight: 700; margin-top: 15px; display: none; }
+    .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 0.8s ease infinite; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* --- Header --- */
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    .header h1 { font-size: 30px; font-weight: 900; color: var(--primary); margin: 0; }
+    .nav-group { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-3d { padding: 10px 24px; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; font-size: 16px; box-shadow: var(--btn-inset); transition: 0.1s; white-space: nowrap; }
+    .btn-3d:active { transform: translateY(2px); box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2); }
+    .btn-red { background: var(--accent); color: white; }
+    .btn-white { background: white; color: var(--primary); border: 1px solid #fee2e2; }
+    .btn-green { background: #22c55e; color: white; }
+    .btn-orange { background: #f59e0b; color: white; }
+
+    /* --- Week Navigation --- */
+    .week-nav { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; background: white; padding: 15px 25px; border-radius: 20px; box-shadow: var(--shadow-3d); border: 1px solid var(--card-border); }
+    .week-nav button { padding: 8px 18px; border: 1px solid #fee2e2; border-radius: 10px; background: white; cursor: pointer; font-weight: 800; font-size: 16px; color: var(--primary); }
+    .week-nav button:hover { background: #fdf2f2; }
+    .week-nav button.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .week-title { font-size: 18px; font-weight: 900; color: var(--primary); min-width: 220px; text-align: center; }
+    .view-toggle { display: flex; gap: 5px; margin-left: 20px; }
+    .view-toggle button { padding: 6px 14px; border: 1px solid #e2e8f0; border-radius: 8px; background: white; cursor: pointer; font-weight: 700; font-size: 13px; }
+    .view-toggle button.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    /* --- Calendar Grid --- */
+    .calendar-wrap { background: white; border-radius: 24px; box-shadow: var(--shadow-3d); border: 1px solid var(--card-border); overflow: hidden; }
+    .calendar-grid { display: grid; grid-template-columns: 70px repeat(7, 1fr); }
+    .day-header { padding: 12px 8px; text-align: center; font-weight: 900; font-size: 13px; color: var(--primary); background: #fff5f5; border-bottom: 2px solid #fee2e2; border-left: 1px solid #f1f5f9; }
+    .day-header.today { background: #fef2f2; color: var(--accent); }
+    .day-header .date { font-size: 20px; display: block; margin-top: 2px; }
+    .time-label { padding: 0 6px; font-size: 11px; color: #94a3b8; font-weight: 700; text-align: right; height: 60px; line-height: 60px; border-bottom: 1px solid #f8fafc; background: #fafafa; }
+    .time-cell { border-left: 1px solid #f1f5f9; border-bottom: 1px solid #f8fafc; min-height: 60px; position: relative; cursor: pointer; padding: 2px; }
+    .time-cell:hover { background: #fef2f2; }
+
+    .sch-card { padding: 4px 6px; border-radius: 6px; font-size: 11px; cursor: pointer; border-left: 3px solid; margin-bottom: 2px; line-height: 1.3; }
+    .sch-card .name { font-weight: 900; }
+    .sch-card .info { color: #64748b; font-size: 10px; }
+    .sch-pending { background: #dbeafe; border-color: #3b82f6; }
+    .sch-progress { background: #fef3c7; border-color: #f59e0b; }
+    .sch-done { background: #dcfce7; border-color: #22c55e; }
+    .sch-cancel { background: #f1f5f9; border-color: #94a3b8; opacity: 0.5; }
+
+    /* --- List View --- */
+    .list-view { display: none; }
+    .list-view table { width: 100%; border-collapse: collapse; }
+    .list-view th { background: #fff5f5; padding: 12px; text-align: left; font-size: 13px; color: var(--primary); font-weight: 900; border-bottom: 2px solid #fee2e2; white-space: nowrap; }
+    .list-view td { padding: 10px 12px; border-bottom: 1px solid #fff1f1; font-size: 14px; }
+    .list-view tr:hover td { background: #fffafa; }
+    .badge { padding: 4px 10px; border-radius: 8px; font-weight: 900; font-size: 12px; display: inline-block; }
+    .badge-pending { background: #dbeafe; color: #1e40af; }
+    .badge-progress { background: #fef3c7; color: #92400e; }
+    .badge-done { background: #dcfce7; color: #166534; }
+    .badge-cancel { background: #f1f5f9; color: #94a3b8; }
+
+    /* --- Stats --- */
+    .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    .stat-card { padding: 15px 10px; border-radius: 16px; box-shadow: var(--shadow-3d); color: white; text-align: center; border-bottom: 4px solid rgba(0,0,0,0.15); }
+    .s1 { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+    .s2 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .s3 { background: linear-gradient(135deg, #22c55e, #15803d); }
+    .s4 { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+    .stat-card .label { font-size: 12px; font-weight: 900; opacity: 0.9; }
+    .stat-card .value { font-size: 28px; font-weight: 900; margin-top: 3px; }
+
+    /* --- Modal --- */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.7); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; }
+    .modal-content { background: white; padding: 35px; border-radius: 30px; width: 95%; max-width: 550px; max-height: 90vh; overflow-y: auto; position: relative; }
+    .close-btn { position: absolute; top: 20px; right: 20px; background: #f1f5f9; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 100; }
+    .close-btn:hover { background: #fee2e2; }
+    .modal h3 { font-size: 22px; font-weight: 900; color: var(--primary); margin: 0 0 25px; border-bottom: 3px solid var(--accent); padding-bottom: 12px; }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 900; color: var(--primary); margin-bottom: 6px; }
+    .form-group input, .form-group select { width: 100%; height: 48px; padding: 0 15px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 15px; font-weight: 700; color: #1e293b; }
+    .form-group input:focus, .form-group select:focus { border-color: var(--accent); outline: none; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* Candidate Search in Modal */
+    .search-results { max-height: 180px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 12px; margin-top: 5px; }
+    .search-result-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
+    .search-result-item:hover { background: #fdf2f2; }
+    .search-result-item .sr-name { font-weight: 900; }
+    .search-result-item .sr-info { font-size: 12px; color: #64748b; }
+
+    /* Status Quick Buttons */
+    .status-btns { display: flex; gap: 8px; margin-top: 15px; }
+    .status-btns button { flex: 1; padding: 10px; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 13px; }
+
+    /* --- Overlay & Toast --- */
+    .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; z-index: 3000; flex-direction: column; gap: 15px; }
+    .loading-overlay .spinner-lg { width: 50px; height: 50px; border: 5px solid #fee2e2; border-radius: 50%; border-top-color: var(--accent); animation: spin 0.8s ease infinite; }
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 25px; border-radius: 15px; font-size: 14px; font-weight: 700; z-index: 3000; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+    .toast.success { background: #22c55e; }
+    .toast.error { background: #ef4444; }
+    .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; font-size: 16px; font-weight: 700; }
+
+    /* --- Mobile --- */
+    @media (max-width: 768px) {
+      body { padding: 10px; }
+      .header { flex-direction: column; text-align: center; gap: 12px; }
+      .header h1 { font-size: 22px; }
+      .stat-row { grid-template-columns: repeat(2, 1fr); }
+      .week-nav { flex-wrap: wrap; padding: 12px; gap: 8px; }
+      .week-title { font-size: 15px; min-width: auto; }
+      .view-toggle { margin-left: 0; }
+      .calendar-grid { grid-template-columns: 50px repeat(7, 1fr); }
+      .time-label { font-size: 10px; padding: 0 3px; }
+      .sch-card { font-size: 10px; padding: 3px 4px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner-lg"></div><div style="color:var(--primary); font-weight:900; font-size:18px;">載入排程中...</div></div>
+<div class="toast" id="toast"></div>
+
+<div class="app-container">
+  <div id="loginArea">
+    <div class="login-card">
+      <h2>面試排程看板</h2>
+      <div class="sub">Interview Schedule Board</div>
+      <div class="pw-wrap">
+        <input type="password" id="pw" placeholder="輸入管理密碼" onkeypress="if(event.keyCode===13) doLogin()" autocomplete="current-password">
+        <button type="button" id="togglePwBtn" class="pw-toggle" onclick="togglePwView()" title="顯示/隱藏密碼">👁</button>
+      </div>
+      <label class="remember-label">
+        <input type="checkbox" id="rememberPw"> 記住密碼
+      </label>
+      <button id="loginBtn" class="login-main-btn" onclick="doLogin()">進入排程系統</button>
+      <div class="login-error" id="loginError"></div>
+      <a href="admin.html" style="display:block; margin-top:25px; color:var(--accent); text-decoration:none; font-weight:bold; font-size:16px;">返回管理中心</a>
+    </div>
+  </div>
+
+  <div id="mainUI" style="display:none;">
+    <div class="header">
+      <h1>面試排程看板</h1>
+      <div class="nav-group">
+        <button class="btn-3d btn-green" onclick="openNewSchedule()">+ 新增排程</button>
+        <button class="btn-3d btn-white" onclick="refreshSchedules()">重新整理</button>
+        <button class="btn-3d btn-orange" onclick="location.href='interview.html'">面試評分</button>
+        <button class="btn-3d btn-white" onclick="location.href='admin.html'">管理中心</button>
+        <button class="btn-3d btn-red" onclick="logout()">登出</button>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card s1"><div class="label">本週排程</div><div class="value" id="st-week">0</div></div>
+      <div class="stat-card s2"><div class="label">待面試</div><div class="value" id="st-pending">0</div></div>
+      <div class="stat-card s3"><div class="label">已完成</div><div class="value" id="st-done">0</div></div>
+      <div class="stat-card s4"><div class="label">已取消</div><div class="value" id="st-cancel">0</div></div>
+    </div>
+
+    <div class="week-nav">
+      <button onclick="changeWeek(-1)">&lsaquo; 前一週</button>
+      <button onclick="goToday()" class="active">今天</button>
+      <div class="week-title" id="weekTitle"></div>
+      <button onclick="changeWeek(1)">後一週 &rsaquo;</button>
+      <div class="view-toggle">
+        <button id="vCal" class="active" onclick="switchView('calendar')">週曆</button>
+        <button id="vList" onclick="switchView('list')">列表</button>
+      </div>
+    </div>
+
+    <!-- Calendar View -->
+    <div class="calendar-wrap" id="calendarView">
+      <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+
+    <!-- List View -->
+    <div class="list-view" id="listView">
+      <div class="calendar-wrap">
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr>
+              <th>日期</th><th>時間</th><th>候選人</th><th>職務</th><th>面試官</th><th>地點</th><th>時長</th><th>狀態</th><th>操作</th>
+            </tr></thead>
+            <tbody id="listBody"></tbody>
+          </table>
+        </div>
+        <div id="listEmpty" class="empty-state" style="display:none;">目前沒有排程資料</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Schedule Modal (New/Edit) -->
+<div id="scheduleModal" class="modal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closeModal('scheduleModal')">&times;</button>
+    <h3 id="modalTitle">新增面試排程</h3>
+
+    <div class="form-group">
+      <label>選擇候選人</label>
+      <select id="candidateSelect" onchange="onCandidateSelect()">
+        <option value="">-- 請選擇候選人 --</option>
+      </select>
+      <input type="hidden" id="selectedAppId">
+      <input type="hidden" id="candidateSearch">
+      <div id="selectedCandidate" style="display:none; margin-top:8px; padding:10px 15px; background:#dcfce7; border-radius:10px; font-weight:700; color:#166534;"></div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>面試日期</label>
+        <input type="text" id="schDate" placeholder="例：2025-03-01" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'">
+      </div>
+      <div class="form-group">
+        <label>面試時間</label>
+        <input type="text" id="schTime" placeholder="例：09:00" onfocus="this.type='time'" onblur="if(!this.value)this.type='text'">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>時長</label>
+        <select id="schDuration">
+          <option value="30">30 分鐘</option>
+          <option value="45">45 分鐘</option>
+          <option value="60">60 分鐘</option>
+          <option value="90">90 分鐘</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>面試地點</label>
+        <input type="text" id="schLocation" placeholder="例：3F 會議室 A">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>面試官</label>
+      <input type="text" id="schInterviewer" placeholder="面試官姓名">
+    </div>
+
+    <input type="hidden" id="editScheduleId">
+
+    <button class="btn-3d btn-red" style="width:100%; height:55px; font-size:18px; margin-top:10px;" id="scheduleSubmitBtn" onclick="submitSchedule()">確認排程</button>
+
+    <div id="editStatusArea" style="display:none; margin-top:15px;">
+      <div style="font-size:13px; font-weight:900; color:var(--primary); margin-bottom:8px;">快速更新狀態</div>
+      <div class="status-btns">
+        <button style="background:#3b82f6; color:white;" onclick="quickStatus('待面試')">待面試</button>
+        <button style="background:#f59e0b; color:white;" onclick="quickStatus('進行中')">進行中</button>
+        <button style="background:#22c55e; color:white;" onclick="quickStatus('已完成')">已完成</button>
+        <button style="background:#ef4444; color:white;" onclick="quickStatus('已取消')">已取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_URL = "https://script.google.com/macros/s/AKfycbyQowSQ7CyUi44l5b3QXbkiEylN1TOeTUIxtirDOnbh1qbXH1YnZ3v0ylq2-kjsXQjxCQ/exec";
+  let currentPw = '', allSchedules = [], currentWeekStart = null, currentView = 'calendar';
+
+  // === Password View & Remember ===
+  function togglePwView() {
+    const inp = document.getElementById('pw');
+    const btn = document.getElementById('togglePwBtn');
+    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+    else { inp.type = 'password'; btn.textContent = '👁'; }
+  }
+
+  // 頁面載入時自動填入儲存的密碼
+  (function loadSavedPw() {
+    const saved = localStorage.getItem('schedule_pw');
+    if (saved) {
+      document.getElementById('pw').value = saved;
+      document.getElementById('rememberPw').checked = true;
+    }
+  })();
+
+  function escapeHtml(str) { if (str == null) return ''; const d = document.createElement('div'); d.textContent = String(str); return d.innerHTML; }
+  function showLoading(s) { document.getElementById('loadingOverlay').style.display = s ? 'flex' : 'none'; }
+  function showToast(msg, type) { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast show ' + (type || ''); setTimeout(() => t.className = 'toast', 3000); }
+  function closeModal(id) { document.getElementById(id).style.display = 'none'; document.body.style.overflow = ''; }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal').forEach(m => { if (m.style.display === 'flex') closeModal(m.id); }); });
+
+  // === Date Helpers ===
+  function getMonday(d) { const dt = new Date(d); const day = dt.getDay(); const diff = dt.getDate() - day + (day === 0 ? -6 : 1); dt.setDate(diff); dt.setHours(0,0,0,0); return dt; }
+  function fmtDate(d) { return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0'); }
+  function fmtDateISO(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+  const DAYS = ['一','二','三','四','五','六','日'];
+  const HOURS = [];
+  for (let h = 8; h <= 18; h++) HOURS.push(String(h).padStart(2,'0') + ':00');
+
+  // === Login ===
+  async function doLogin() {
+    const pw = document.getElementById('pw').value;
+    const btn = document.getElementById('loginBtn');
+    const err = document.getElementById('loginError');
+    if (!pw) { err.textContent = '請輸入密碼'; err.style.display = 'block'; return; }
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; err.style.display = 'none';
+    try {
+      const res = await fetch(API_URL + '?action=getSchedules&password=' + encodeURIComponent(pw)).then(r => r.json());
+      if (!res.success) { err.textContent = '密碼錯誤'; err.style.display = 'block'; return; }
+      currentPw = pw;
+      // 記住密碼
+      if (document.getElementById('rememberPw').checked) {
+        localStorage.setItem('schedule_pw', pw);
+      } else {
+        localStorage.removeItem('schedule_pw');
+      }
+      allSchedules = res.data || [];
+      document.getElementById('loginArea').style.display = 'none';
+      document.getElementById('mainUI').style.display = 'block';
+      currentWeekStart = getMonday(new Date());
+      renderAll();
+    } catch(e) { err.textContent = '連線失敗'; err.style.display = 'block'; }
+    finally { btn.disabled = false; btn.textContent = '進入排程系統'; }
+  }
+
+  function logout() { currentPw = ''; allSchedules = []; localStorage.removeItem('schedule_pw'); document.getElementById('mainUI').style.display = 'none'; document.getElementById('loginArea').style.display = 'flex'; document.getElementById('pw').value = ''; document.getElementById('rememberPw').checked = false; }
+
+  async function refreshSchedules() {
+    showLoading(true);
+    try {
+      const res = await fetch(API_URL + '?action=getSchedules&password=' + encodeURIComponent(currentPw)).then(r => r.json());
+      if (res.success) { allSchedules = res.data || []; renderAll(); showToast('排程已更新', 'success'); }
+    } catch(e) { showToast('載入失敗', 'error'); }
+    finally { showLoading(false); }
+  }
+
+  // === Week Navigation ===
+  function changeWeek(offset) { currentWeekStart = new Date(currentWeekStart.getTime() + offset * 7 * 86400000); renderAll(); }
+  function goToday() { currentWeekStart = getMonday(new Date()); renderAll(); }
+
+  function switchView(v) {
+    currentView = v;
+    document.getElementById('calendarView').style.display = v === 'calendar' ? 'block' : 'none';
+    document.getElementById('listView').style.display = v === 'list' ? 'block' : 'none';
+    document.getElementById('vCal').classList.toggle('active', v === 'calendar');
+    document.getElementById('vList').classList.toggle('active', v === 'list');
+    renderAll();
+  }
+
+  // === Render ===
+  function renderAll() {
+    renderWeekTitle();
+    updateStats();
+    if (currentView === 'calendar') renderCalendar();
+    else renderList();
+  }
+
+  function renderWeekTitle() {
+    const end = new Date(currentWeekStart.getTime() + 6 * 86400000);
+    document.getElementById('weekTitle').textContent = fmtDate(currentWeekStart) + ' — ' + fmtDate(end);
+  }
+
+  function updateStats() {
+    const weekEnd = new Date(currentWeekStart.getTime() + 7 * 86400000);
+    const weekSchedules = allSchedules.filter(s => {
+      const d = parseScheduleDate(s.interviewDate);
+      return d >= currentWeekStart && d < weekEnd;
+    });
+    document.getElementById('st-week').textContent = weekSchedules.length;
+    document.getElementById('st-pending').textContent = allSchedules.filter(s => s.status === '待面試').length;
+    document.getElementById('st-done').textContent = allSchedules.filter(s => s.status === '已完成').length;
+    document.getElementById('st-cancel').textContent = allSchedules.filter(s => s.status === '已取消').length;
+  }
+
+  function parseScheduleDate(dateStr) {
+    if (!dateStr) return new Date(0);
+    // Support yyyy/MM/dd or yyyy-MM-dd
+    return new Date(dateStr.replace(/\//g, '-'));
+  }
+
+  // 標準化日期字串 → yyyy/MM/dd
+  function normalizeDate(str) {
+    if (!str) return '';
+    // 嘗試解析各種格式
+    const d = new Date(String(str).replace(/\//g, '-'));
+    if (isNaN(d.getTime())) return String(str);
+    return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
+  }
+
+  // 標準化時間字串 → HH:MM
+  function normalizeTime(str) {
+    if (!str) return '';
+    const s = String(str);
+    // 已經是 HH:MM 或 H:MM 格式
+    const m = s.match(/(\d{1,2}):(\d{2})/);
+    if (m) return String(m[1]).padStart(2,'0') + ':' + m[2];
+    return s;
+  }
+
+  // 取得時間的小時數 (0-23)
+  function getHour(timeStr) {
+    const norm = normalizeTime(timeStr);
+    const m = norm.match(/^(\d{2}):/);
+    return m ? parseInt(m[1]) : -1;
+  }
+
+  function renderCalendar() {
+    const grid = document.getElementById('calendarGrid');
+    const today = new Date(); today.setHours(0,0,0,0);
+    let html = '<div class="time-label" style="background:#fff5f5;border-bottom:2px solid #fee2e2;font-weight:900;line-height:normal;padding-top:15px;text-align:center;font-size:12px;color:var(--primary);">時段</div>';
+
+    // Day headers
+    for (let d = 0; d < 7; d++) {
+      const day = new Date(currentWeekStart.getTime() + d * 86400000);
+      const isToday = day.getTime() === today.getTime();
+      html += '<div class="day-header' + (isToday ? ' today' : '') + '">' + DAYS[d] + '<span class="date">' + day.getDate() + '</span></div>';
+    }
+
+    // Time rows
+    for (let h = 0; h < HOURS.length; h++) {
+      html += '<div class="time-label">' + HOURS[h] + '</div>';
+      const slotHour = parseInt(HOURS[h].substring(0, 2));
+      for (let d = 0; d < 7; d++) {
+        const day = new Date(currentWeekStart.getTime() + d * 86400000);
+        const dateStr = fmtDate(day);
+        const dateISO = fmtDateISO(day);
+
+        // Find schedules in this slot
+        const slotSchedules = allSchedules.filter(s => {
+          const normDate = normalizeDate(s.interviewDate);
+          const sHour = getHour(s.interviewTime);
+          return (normDate === dateStr || normDate === dateISO.replace(/-/g, '/')) && sHour === slotHour;
+        });
+
+        html += '<div class="time-cell" onclick="openNewScheduleAt(\'' + dateISO + '\',\'' + HOURS[h] + '\')">';
+        slotSchedules.forEach(s => {
+          const statusClass = s.status === '已完成' ? 'sch-done' : s.status === '進行中' ? 'sch-progress' : s.status === '已取消' ? 'sch-cancel' : 'sch-pending';
+          html += '<div class="sch-card ' + statusClass + '" onclick="event.stopPropagation(); editSchedule(\'' + escapeHtml(s.scheduleId) + '\')">' +
+            '<div class="name">' + escapeHtml(s.candidateName) + '</div>' +
+            '<div class="info">' + escapeHtml(normalizeTime(s.interviewTime)) + ' ' + escapeHtml(s.location) + '</div>' +
+            '</div>';
+        });
+        html += '</div>';
+      }
+    }
+    grid.innerHTML = html;
+  }
+
+  function renderList() {
+    const sorted = [...allSchedules].filter(s => s.status !== '已取消').sort((a, b) => {
+      const da = a.interviewDate + ' ' + a.interviewTime;
+      const db = b.interviewDate + ' ' + b.interviewTime;
+      return da.localeCompare(db);
+    });
+
+    const body = document.getElementById('listBody');
+    const empty = document.getElementById('listEmpty');
+    if (sorted.length === 0) { body.innerHTML = ''; empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+
+    body.innerHTML = sorted.map(s => {
+      const badgeClass = s.status === '已完成' ? 'badge-done' : s.status === '進行中' ? 'badge-progress' : s.status === '已取消' ? 'badge-cancel' : 'badge-pending';
+      return '<tr>' +
+        '<td>' + escapeHtml(normalizeDate(s.interviewDate)) + '</td>' +
+        '<td><strong>' + escapeHtml(normalizeTime(s.interviewTime)) + '</strong></td>' +
+        '<td><strong>' + escapeHtml(s.candidateName) + '</strong></td>' +
+        '<td>' + escapeHtml(s.applicationId || '---') + '</td>' +
+        '<td>' + escapeHtml(s.interviewerName) + '</td>' +
+        '<td>' + escapeHtml(s.location) + '</td>' +
+        '<td>' + s.duration + ' 分</td>' +
+        '<td><span class="badge ' + badgeClass + '">' + escapeHtml(s.status) + '</span></td>' +
+        '<td><button class="btn-3d btn-white" style="padding:4px 10px;font-size:12px;box-shadow:none;border:1px solid #ddd;" onclick="editSchedule(\'' + escapeHtml(s.scheduleId) + '\')">編輯</button></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  // === New / Edit Schedule ===
+  async function openNewSchedule() {
+    resetScheduleForm();
+    document.getElementById('modalTitle').textContent = '新增面試排程';
+    document.getElementById('editScheduleId').value = '';
+    document.getElementById('editStatusArea').style.display = 'none';
+    document.getElementById('scheduleSubmitBtn').textContent = '確認排程';
+    document.getElementById('scheduleModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    await loadCandidates();
+  }
+
+  function openNewScheduleAt(date, time) {
+    openNewSchedule();
+    document.getElementById('schDate').value = date;
+    document.getElementById('schTime').value = time;
+  }
+
+  async function editSchedule(scheduleId) {
+    const s = allSchedules.find(x => x.scheduleId === scheduleId);
+    if (!s) return;
+
+    resetScheduleForm();
+    await loadCandidates();
+    document.getElementById('modalTitle').textContent = '編輯排程 — ' + s.candidateName;
+    document.getElementById('editScheduleId').value = scheduleId;
+    document.getElementById('candidateSearch').value = s.candidateName;
+    document.getElementById('selectedAppId').value = s.applicationId || '';
+    document.getElementById('selectedCandidate').textContent = s.candidateName + (s.applicationId ? ' (' + s.applicationId + ')' : '');
+    document.getElementById('selectedCandidate').style.display = 'block';
+
+    // 自動選中對應的候選人
+    const matchIdx = allCandidatesList.findIndex(c => c.applicationId === s.applicationId || c.name === s.candidateName);
+    if (matchIdx >= 0) {
+      document.getElementById('candidateSelect').value = matchIdx;
+    }
+    document.getElementById('candidateSelect').disabled = true;
+
+    document.getElementById('schDate').value = s.interviewDate.replace(/\//g, '-');
+    document.getElementById('schTime').value = s.interviewTime;
+    document.getElementById('schDuration').value = s.duration;
+    document.getElementById('schLocation').value = s.location;
+    document.getElementById('schInterviewer').value = s.interviewerName;
+    document.getElementById('editStatusArea').style.display = 'block';
+    document.getElementById('scheduleSubmitBtn').textContent = '更新排程';
+    document.getElementById('scheduleModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function resetScheduleForm() {
+    document.getElementById('candidateSelect').value = '';
+    document.getElementById('candidateSelect').disabled = false;
+    document.getElementById('candidateSearch').value = '';
+    document.getElementById('selectedAppId').value = '';
+    document.getElementById('selectedCandidate').style.display = 'none';
+    document.getElementById('schDate').value = '';
+    document.getElementById('schTime').value = '';
+    document.getElementById('schDuration').value = '30';
+    document.getElementById('schLocation').value = '';
+    document.getElementById('schInterviewer').value = '';
+  }
+
+  // === Candidate Dropdown ===
+  let allCandidatesList = [];
+
+  async function loadCandidates() {
+    try {
+      const res = await fetch(API_URL + '?action=searchCandidates&password=' + encodeURIComponent(currentPw) + '&query=').then(r => r.json());
+      if (res.success && res.data) {
+        allCandidatesList = res.data;
+        populateCandidateDropdown();
+      }
+    } catch(e) { console.error('載入候選人失敗', e); }
+  }
+
+  function populateCandidateDropdown() {
+    const select = document.getElementById('candidateSelect');
+    select.innerHTML = '<option value="">-- 請選擇候選人 --</option>';
+    allCandidatesList.forEach((c, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = c.name + ' — ' + c.position + ' | ' + c.dept + ' | 測驗 ' + c.examScore + ' 分';
+      select.appendChild(opt);
+    });
+  }
+
+  function onCandidateSelect() {
+    const select = document.getElementById('candidateSelect');
+    const idx = select.value;
+    if (idx === '') {
+      document.getElementById('candidateSearch').value = '';
+      document.getElementById('selectedAppId').value = '';
+      document.getElementById('selectedCandidate').style.display = 'none';
+      return;
+    }
+    const c = allCandidatesList[parseInt(idx)];
+    document.getElementById('candidateSearch').value = c.name;
+    document.getElementById('selectedAppId').value = c.applicationId || '';
+    document.getElementById('selectedCandidate').textContent = c.name + (c.applicationId ? ' (' + c.applicationId + ')' : '') + ' — ' + c.position;
+    document.getElementById('selectedCandidate').style.display = 'block';
+  }
+
+  function selectCandidate(appId, name, position) {
+    document.getElementById('candidateSearch').value = name;
+    document.getElementById('selectedAppId').value = appId;
+    document.getElementById('selectedCandidate').textContent = name + (appId ? ' (' + appId + ')' : '') + ' — ' + position;
+    document.getElementById('selectedCandidate').style.display = 'block';
+  }
+
+  // === Submit Schedule ===
+  async function submitSchedule() {
+    const scheduleId = document.getElementById('editScheduleId').value;
+    const candidateName = document.getElementById('candidateSearch').value.trim() || '';
+    const appId = document.getElementById('selectedAppId').value;
+    const date = document.getElementById('schDate').value;
+    const time = document.getElementById('schTime').value;
+    const duration = document.getElementById('schDuration').value;
+    const location = document.getElementById('schLocation').value.trim();
+    const interviewer = document.getElementById('schInterviewer').value.trim();
+
+    if (!candidateName) { showToast('請選擇候選人', 'error'); return; }
+    if (!date) { showToast('請選擇日期', 'error'); return; }
+    if (!time) { showToast('請選擇時間', 'error'); return; }
+    if (!location) { showToast('請輸入地點', 'error'); return; }
+    if (!interviewer) { showToast('請輸入面試官', 'error'); return; }
+
+    const btn = document.getElementById('scheduleSubmitBtn');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+
+    try {
+      const body = {
+        action: scheduleId ? 'updateSchedule' : 'createSchedule',
+        password: currentPw,
+        candidateName: candidateName,
+        applicationId: appId,
+        interviewDate: date,
+        interviewTime: time,
+        duration: parseInt(duration),
+        location: location,
+        interviewerName: interviewer
+      };
+      if (scheduleId) body.scheduleId = scheduleId;
+
+      const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(body) }).then(r => r.json());
+      if (res.success) {
+        showToast(scheduleId ? '排程已更新' : '排程已建立', 'success');
+        closeModal('scheduleModal');
+        await refreshSchedules();
+      } else {
+        showToast(res.message || '操作失敗', 'error');
+      }
+    } catch(e) { showToast('連線失敗', 'error'); }
+    finally { btn.disabled = false; btn.textContent = scheduleId ? '更新排程' : '確認排程'; }
+  }
+
+  // === Quick Status Update ===
+  async function quickStatus(status) {
+    const scheduleId = document.getElementById('editScheduleId').value;
+    if (!scheduleId) return;
+
+    try {
+      const action = status === '已取消' ? 'deleteSchedule' : 'updateSchedule';
+      const body = { action: action, password: currentPw, scheduleId: scheduleId };
+      if (status !== '已取消') body.status = status;
+
+      const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(body) }).then(r => r.json());
+      if (res.success) {
+        showToast('狀態已更新：' + status, 'success');
+        closeModal('scheduleModal');
+        await refreshSchedules();
+      } else { showToast(res.message || '操作失敗', 'error'); }
+    } catch(e) { showToast('連線失敗', 'error'); }
+  }
+</script>
+</body>
+</html>

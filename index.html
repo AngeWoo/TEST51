@@ -8,8 +8,8 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap');
 
-    :root { 
-      --primary: #991b1b; --accent: #ef4444; --bg: #fdf2f2;      
+    :root {
+      --primary: #991b1b; --accent: #ef4444; --bg: #fdf2f2;
       --card-border: #fee2e2; --shadow-3d: 0 10px 25px -5px rgba(153, 27, 27, 0.15);
       --btn-shadow: 0 6px 0 #b91c1c;
     }
@@ -17,17 +17,18 @@
     body { font-family: 'Inter', 'Noto Sans TC', sans-serif; background: var(--bg); margin: 0; padding: 30px 15px; color: #1e293b; font-size: 18px; }
 
     .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 30px; box-shadow: 0 30px 60px -12px rgba(153, 27, 27, 0.15); overflow: hidden; position: relative; border: 1px solid var(--card-border); }
-    
+
     /* --- Header --- */
     .header { background: linear-gradient(135deg, #ef4444, #991b1b); color: white; padding: 40px 30px; text-align: center; position: relative; }
     .header h1 { margin: 0; font-size: 28px; font-weight: 900; }
-    
+
     .edit-resume-btn { position: absolute; bottom: 10px; right: 20px; background: white; color: var(--primary); border: none; padding: 8px 15px; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 0 #ddd; display: none; }
     .edit-resume-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #ddd; }
 
     .content { padding: 30px; }
     .stepper { display: flex; justify-content: space-between; padding: 15px 25px; background: #fffafa; border-bottom: 2px solid var(--card-border); font-size: 15px; font-weight: 900; color: #94a3b8; }
     .step-idx.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
+    .step-idx.completed { color: #22c55e; }
 
     .step { display: none; animation: fadeIn 0.4s ease; }
     .step.active { display: block; }
@@ -36,18 +37,26 @@
     .section-title { font-size: 22px; color: var(--primary); font-weight: 900; border-left: 6px solid var(--accent); padding-left: 12px; margin: 30px 0 20px; grid-column: span 2; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .full { grid-column: span 2; }
-    
+
     label { display: block; margin-bottom: 5px; font-weight: 700; font-size: 16px; color: #475569; }
-    input, select, textarea { width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; box-sizing: border-box; font-size: 17px; background: #fff; }
-    input:focus { border-color: var(--accent); outline: none; }
+    input, select, textarea { width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; box-sizing: border-box; font-size: 17px; background: #fff; transition: border-color 0.2s; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1); }
+    input.invalid, select.invalid, textarea.invalid { border-color: #ef4444; background: #fff5f5; }
     textarea { resize: vertical; min-height: 100px; font-family: inherit; }
-    
-    .btn-next { background: var(--accent); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: 900; cursor: pointer; width: 100%; font-size: 20px; margin-top: 20px; box-shadow: var(--btn-shadow); }
+    .field-error { color: #ef4444; font-size: 13px; margin-top: 4px; display: none; font-weight: 600; }
+
+    .btn-next { background: var(--accent); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: 900; cursor: pointer; width: 100%; font-size: 20px; margin-top: 20px; box-shadow: var(--btn-shadow); transition: 0.2s; }
     .btn-next:active { transform: translateY(4px); box-shadow: 0 2px 0 #b91c1c; }
+    .btn-next:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-next .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 0.8s ease infinite; margin-right: 8px; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .btn-clear { background: white; color: var(--primary); border: 2px solid var(--card-border); padding: 14px 20px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 16px; flex: 1; }
 
     .q-card { background: #fffafa; padding: 25px; border-radius: 20px; margin-bottom: 20px; border: 1px solid var(--card-border); box-shadow: var(--shadow-3d); }
     .q-card p { font-weight: 900; font-size: 19px; color: var(--primary); margin: 0 0 15px 0; text-align: left; }
-    
+    .q-card.unanswered { border: 2px solid #ef4444; }
+
     .opt-label { display: flex; align-items: center; justify-content: flex-start; padding: 14px 18px; margin: 10px 0; background: white; border: 1px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: 0.2s; width: 100%; box-sizing: border-box; }
     .opt-label:hover { border-color: var(--accent); background: #fff5f5; }
     .opt-label input { width: 22px; height: 22px; margin: 0 15px 0 0; flex-shrink: 0; accent-color: var(--primary); }
@@ -56,21 +65,20 @@
     /* --- 立體簽名框優化 --- */
     .signature-wrapper {
       width: 100%;
-      background: #f1f5f9; /* 稍微深一點的背景底色 */
+      background: #f1f5f9;
       padding: 10px;
       border-radius: 20px;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); /* 外圍微凹 */
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
       margin: 20px 0;
     }
-    .canvas-container { 
-      width: 100%; 
-      background: white; 
-      border: 2px solid #cbd5e1; 
-      border-radius: 16px; 
+    .canvas-container {
+      width: 100%;
+      background: white;
+      border: 2px solid #cbd5e1;
+      border-radius: 16px;
       touch-action: none;
       position: relative;
-      /* 3D 內凹陰影核心 */
-      box-shadow: 
+      box-shadow:
         inset 2px 2px 8px rgba(0,0,0,0.1),
         0 1px 2px rgba(255,255,255,1);
       overflow: hidden;
@@ -88,70 +96,168 @@
 
     #saveToast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 3000; opacity: 0.9; }
 
+    /* --- 同意書條款 --- */
+    .consent-terms { background: #fffafa; padding: 25px; font-size: 15px; color: #475569; border-radius: 15px; border: 1px solid var(--card-border); margin-bottom: 15px; max-height: 300px; overflow-y: auto; line-height: 1.8; }
+    .consent-terms h4 { color: var(--primary); margin: 0 0 10px 0; }
+    .consent-terms ol { padding-left: 20px; margin: 10px 0; }
+    .consent-terms li { margin-bottom: 8px; }
+    .consent-checkbox { display: flex; align-items: center; gap: 10px; padding: 15px; background: #fff5f5; border-radius: 12px; margin: 15px 0; font-weight: 700; }
+    .consent-checkbox input { width: 22px; height: 22px; accent-color: var(--primary); }
+
+    /* --- 申請完成追蹤碼 --- */
+    .tracking-code { background: #f0fff4; padding: 20px; border-radius: 15px; border: 2px solid #c6f6d5; margin: 20px 0; text-align: center; }
+    .tracking-code .code { font-size: 28px; font-weight: 900; color: var(--primary); letter-spacing: 3px; font-family: monospace; user-select: all; }
+
+    /* --- 自動儲存指示器 --- */
+    .autosave-indicator { position: fixed; top: 15px; right: 15px; background: #22c55e; color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; opacity: 0; transition: opacity 0.3s; z-index: 3000; }
+    .autosave-indicator.show { opacity: 1; }
+
     @media (max-width: 768px) {
       .grid { grid-template-columns: 1fr; }
+      .full { grid-column: span 1; }
       .header h1 { font-size: 22px; }
       .content { padding: 20px; }
       .signature-wrapper { padding: 5px; }
+      .stepper { font-size: 12px; padding: 12px 15px; }
     }
   </style>
 </head>
 <body>
 
 <div id="saveToast">正在背景儲存資料...</div>
+<div id="autosaveIndicator" class="autosave-indicator">已自動儲存</div>
 
 <div class="container">
   <div class="header">
     <h1>炎洲集團人才招募E化系統</h1>
-    <button id="editBtn" class="edit-resume-btn" onclick="openEditModal()">🖊️ 修改履歷</button>
+    <button id="editBtn" class="edit-resume-btn" onclick="openEditModal()" aria-label="修改履歷資料">修改履歷</button>
   </div>
 
-  <div class="stepper">
-    <div id="s1" class="step-idx active">1. 填寫履歷</div>
-    <div id="s2" class="step-idx">2. 簽署文件</div>
-    <div id="s3" class="step-idx">3. 專業測驗</div>
-    <div id="s4" class="step-idx">4. 申請完成</div>
+  <div class="stepper" role="navigation" aria-label="申請步驟">
+    <div id="s1" class="step-idx active" role="tab" aria-selected="true">1. 填寫履歷</div>
+    <div id="s2" class="step-idx" role="tab" aria-selected="false">2. 簽署文件</div>
+    <div id="s3" class="step-idx" role="tab" aria-selected="false">3. 專業測驗</div>
+    <div id="s4" class="step-idx" role="tab" aria-selected="false">4. 申請完成</div>
   </div>
 
   <div class="content">
-    <div id="step1" class="step active">
-      <form id="resumeForm" class="grid">
+    <!-- ========== STEP 1: 填寫履歷 ========== -->
+    <div id="step1" class="step active" role="tabpanel">
+      <form id="resumeForm" class="grid" novalidate>
         <div class="section-title">個人基本資料</div>
-        <div class="input-group"><label>姓名 *</label><input type="text" name="name" required></div>
-        <div class="input-group"><label>性別</label><select name="gender"><option>男</option><option>女</option></select></div>
-        <div class="input-group"><label>出生日期 *</label><input type="date" name="birthday" required></div>
-        <div class="input-group"><label>聯絡電話 *</label><input type="tel" name="phone" required></div>
-        <div class="input-group full"><label>電子郵件 *</label><input type="email" name="email" required></div>
-        <div class="input-group full"><label>通訊地址</label><input type="text" name="address"></div>
+        <div class="input-group">
+          <label for="f-name">姓名 <span style="color:#ef4444">*</span></label>
+          <input type="text" id="f-name" name="name" required maxlength="50" autocomplete="name">
+          <div class="field-error" id="err-name">請輸入姓名</div>
+        </div>
+        <div class="input-group">
+          <label for="f-gender">性別</label>
+          <select id="f-gender" name="gender">
+            <option value="">請選擇</option>
+            <option>男</option>
+            <option>女</option>
+            <option>其他</option>
+            <option>不願透露</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="f-birthday">出生日期 <span style="color:#ef4444">*</span></label>
+          <input type="date" id="f-birthday" name="birthday" required max="">
+          <div class="field-error" id="err-birthday">請選擇出生日期</div>
+        </div>
+        <div class="input-group">
+          <label for="f-phone">聯絡電話 <span style="color:#ef4444">*</span></label>
+          <input type="tel" id="f-phone" name="phone" required pattern="[0-9\-\+\s]{7,15}" maxlength="15" autocomplete="tel" placeholder="例: 0912-345-678">
+          <div class="field-error" id="err-phone">請輸入有效電話號碼</div>
+        </div>
+        <div class="input-group full">
+          <label for="f-email">電子郵件 <span style="color:#ef4444">*</span></label>
+          <input type="email" id="f-email" name="email" required maxlength="100" autocomplete="email" placeholder="example@email.com">
+          <div class="field-error" id="err-email">請輸入有效的電子郵件地址</div>
+        </div>
+        <div class="input-group full">
+          <label for="f-address">通訊地址</label>
+          <input type="text" id="f-address" name="address" maxlength="200" autocomplete="street-address">
+        </div>
 
         <div class="section-title">專業背景與需求</div>
-        <div class="input-group"><label>最高學歷</label><input type="text" name="edu"></div>
-        <div class="input-group"><label>畢業學校</label><input type="text" name="school"></div>
-        <div class="input-group"><label>科系名稱</label><input type="text" name="major"></div>
-        <div class="input-group"><label>工作年資 (年)</label><input type="number" name="expYears" value="0"></div>
-        <div class="input-group"><label>應徵職務 *</label><input type="text" name="job" required></div>
         <div class="input-group">
-          <label>需求單位 *</label>
-          <select name="dept" required>
+          <label for="f-edu">最高學歷</label>
+          <select id="f-edu" name="edu">
+            <option value="">請選擇</option>
+            <option>高中/職</option>
+            <option>專科</option>
+            <option>學士</option>
+            <option>碩士</option>
+            <option>博士</option>
+            <option>其他</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="f-school">畢業學校</label>
+          <input type="text" id="f-school" name="school" maxlength="100">
+        </div>
+        <div class="input-group">
+          <label for="f-major">科系名稱</label>
+          <input type="text" id="f-major" name="major" maxlength="100">
+        </div>
+        <div class="input-group">
+          <label for="f-expYears">工作年資 (年)</label>
+          <input type="number" id="f-expYears" name="expYears" value="0" min="0" max="50">
+        </div>
+        <div class="input-group">
+          <label for="f-job">應徵職務 <span style="color:#ef4444">*</span></label>
+          <input type="text" id="f-job" name="job" required maxlength="100">
+          <div class="field-error" id="err-job">請輸入應徵職務</div>
+        </div>
+        <div class="input-group">
+          <label for="f-dept">需求單位 <span style="color:#ef4444">*</span></label>
+          <select id="f-dept" name="dept" required>
             <option value="">請選擇單位</option>
             <option>行政部</option><option>技術開發部</option><option>行銷部</option>
             <option>業務部</option><option>研發部</option><option>財務部</option>
           </select>
+          <div class="field-error" id="err-dept">請選擇需求單位</div>
         </div>
-        <div class="input-group full"><label>工作經歷簡述</label><textarea name="expDetail"></textarea></div>
-        <div class="input-group full"><label>專長技能</label><textarea name="skills"></textarea></div>
-        <div class="input-group full"><label>自我介紹</label><textarea name="intro"></textarea></div>
+        <div class="input-group full">
+          <label for="f-expDetail">工作經歷簡述</label>
+          <textarea id="f-expDetail" name="expDetail" maxlength="2000"></textarea>
+        </div>
+        <div class="input-group full">
+          <label for="f-skills">專長技能</label>
+          <textarea id="f-skills" name="skills" maxlength="1000"></textarea>
+        </div>
+        <div class="input-group full">
+          <label for="f-intro">自我介紹</label>
+          <textarea id="f-intro" name="intro" maxlength="3000"></textarea>
+        </div>
       </form>
-      <button class="btn-next" onclick="submitStep1()">下一步：簽署文件</button>
+      <button class="btn-next" id="btnStep1" onclick="submitStep1()">下一步：簽署文件</button>
     </div>
 
-    <div id="step2" class="step">
+    <!-- ========== STEP 2: 簽署同意書 ========== -->
+    <div id="step2" class="step" role="tabpanel">
       <h3 style="text-align:center;">應徵者個人資料蒐集同意書</h3>
-      <div style="background:#fffafa; padding:20px; font-size:15px; color:#475569; border-radius:15px; border:1px solid var(--card-border); margin-bottom:15px;">
-        請完成下方簽名以確認您同意上述條款。
+      <div class="consent-terms">
+        <h4>個人資料蒐集、處理及利用同意書</h4>
+        <p>依據「個人資料保護法」及相關法規規定，炎洲集團（以下簡稱本公司）就您所提供之個人資料，說明如下：</p>
+        <ol>
+          <li><strong>蒐集目的：</strong>本公司基於人力資源管理、僱用與服務管理之目的，蒐集您的個人資料。</li>
+          <li><strong>蒐集類別：</strong>包括但不限於姓名、性別、出生日期、聯絡方式、通訊地址、學歷、工作經歷、專長技能、應徵資料及專業測驗成績等。</li>
+          <li><strong>利用期間：</strong>自您提供個人資料之日起，至本公司招募流程結束後一年，或依相關法令規定之保存期限。超過保存期限後，本公司將主動刪除或停止處理及利用。</li>
+          <li><strong>利用地區：</strong>本公司及所屬關係企業之營業據點所在地。</li>
+          <li><strong>利用方式：</strong>以自動化機器或其他非自動化方式，進行資料之蒐集、處理及利用。</li>
+          <li><strong>您的權利：</strong>依據個資法第三條，您得就個人資料行使查詢、閱覽、複製、補充、更正、請求停止蒐集處理利用及刪除等權利。如欲行使上述權利，請洽本公司人力資源部門。</li>
+          <li><strong>自由選擇：</strong>您可以自由選擇是否提供個人資料。但若資料不足或不完整，可能影響本公司審查您的應徵申請。</li>
+        </ol>
+        <p style="margin-top: 15px; font-weight: 700;">本人已詳閱上述告知事項，並同意本公司於上述範圍內蒐集、處理及利用本人之個人資料。</p>
       </div>
-      
-      <!-- 優化後的立體簽名區域 -->
+
+      <div class="consent-checkbox">
+        <input type="checkbox" id="consentCheck">
+        <label for="consentCheck" style="margin:0; cursor:pointer;">我已詳閱並同意上述個人資料蒐集同意書之全部內容</label>
+      </div>
+
       <div class="signature-wrapper">
         <div class="canvas-container">
           <canvas id="sig-pad"></canvas>
@@ -161,24 +267,32 @@
 
       <div style="display:flex; gap:10px;">
         <button onclick="sig.clear()" class="btn-clear">清除重簽</button>
-        <button onclick="submitStep2()" class="btn-next" style="flex:2; margin-top:0;">確認簽署並開始測驗</button>
+        <button onclick="submitStep2()" id="btnStep2" class="btn-next" style="flex:2; margin-top:0;">確認簽署並開始測驗</button>
       </div>
     </div>
 
-    <div id="step3" class="step">
+    <!-- ========== STEP 3: 專業測驗 ========== -->
+    <div id="step3" class="step" role="tabpanel">
       <h3 style="text-align:center;">專業適性評測</h3>
+      <p style="text-align:center; color:#64748b; font-size:15px;">請仔細作答所有題目，每題僅能選擇一個答案</p>
       <div id="examContainer"></div>
+      <div id="examError" style="display:none; color:#ef4444; text-align:center; font-weight:700; margin:10px 0;"></div>
       <button class="btn-next" id="submitBtn" onclick="handleFinalSubmit()">提交所有應徵資料</button>
     </div>
 
-    <div id="step4" class="step" style="text-align:center; padding: 50px 0;">
-      <div style="font-size: 80px; color:#48bb78;">✓</div>
+    <!-- ========== STEP 4: 完成 ========== -->
+    <div id="step4" class="step" style="text-align:center; padding: 50px 0;" role="tabpanel">
+      <div style="font-size: 80px; color:#48bb78;">&#10003;</div>
       <h2 style="color:var(--primary); font-size:32px; font-weight:900;">申請提交成功</h2>
       <div style="margin: 25px 0; background:#f0fff4; padding:25px; border-radius:20px; border:2px solid #c6f6d5; display:inline-block; min-width:250px;">
         <p style="color:#2f855a; margin-bottom:5px; font-weight:bold;">測驗得分</p>
         <span id="scoreDisplay" style="font-size:60px; font-weight:900; color:#22c55e;">0</span>
       </div>
-      <p style="color:#718096;">感謝參與，我們將主動與您連繫。</p>
+      <div class="tracking-code">
+        <p style="color:#475569; margin:0 0 8px 0; font-size:14px; font-weight:700;">您的申請追蹤碼 (請妥善保存)</p>
+        <div class="code" id="trackingCode">---</div>
+      </div>
+      <p style="color:#718096; margin-top:20px;">感謝參與，我們將主動與您連繫。</p>
     </div>
   </div>
 
@@ -187,9 +301,10 @@
   </div>
 </div>
 
-<div id="editModal" class="modal">
+<!-- 修改履歷 Modal -->
+<div id="editModal" class="modal" role="dialog" aria-label="修改履歷">
   <div class="modal-content">
-    <button class="close-btn" onclick="closeModal()">✕</button>
+    <button class="close-btn" onclick="closeModal()" aria-label="關閉">&times;</button>
     <h2 style="color:var(--primary); font-weight:900; border-bottom:3px solid var(--primary); padding-bottom:10px; margin-bottom:20px;">修改履歷資料</h2>
     <form id="editForm" class="grid"></form>
     <button class="btn-next" onclick="saveEditedResume()">儲存修改內容</button>
@@ -198,101 +313,355 @@
 
 <script>
   const GAS_URL = "https://script.google.com/macros/s/AKfycbyQowSQ7CyUi44l5b3QXbkiEylN1TOeTUIxtirDOnbh1qbXH1YnZ3v0ylq2-kjsXQjxCQ/exec";
-  let sig, applicantName = "";
+  let sig, applicantName = "", applicationId = "";
 
+  // === 工具函式 ===
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function generateAppId() {
+    const ts = Date.now().toString(36).toUpperCase();
+    const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+    return 'APP-' + ts + '-' + rand;
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('saveToast');
+    toast.textContent = msg || '正在背景儲存資料...';
+    toast.style.display = 'block';
+  }
+  function hideToast() { document.getElementById('saveToast').style.display = 'none'; }
+
+  function showAutosave() {
+    const el = document.getElementById('autosaveIndicator');
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2000);
+  }
+
+  function setButtonLoading(btn, loading, text) {
+    if (loading) {
+      btn.disabled = true;
+      btn.dataset.origText = btn.textContent;
+      btn.innerHTML = '<span class="spinner"></span>' + (text || '處理中...');
+    } else {
+      btn.disabled = false;
+      btn.textContent = btn.dataset.origText || text || '下一步';
+    }
+  }
+
+  // === 表單驗證 ===
+  function validateField(input) {
+    const name = input.name;
+    const errEl = document.getElementById('err-' + name);
+    let valid = true;
+
+    if (input.required && !input.value.trim()) {
+      valid = false;
+    } else if (input.type === 'email' && input.value) {
+      valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value);
+    } else if (input.type === 'tel' && input.value) {
+      valid = /^[0-9\-\+\s]{7,15}$/.test(input.value);
+    } else if (name === 'birthday' && input.value) {
+      const bDate = new Date(input.value);
+      const now = new Date();
+      const age = (now - bDate) / (365.25 * 24 * 60 * 60 * 1000);
+      valid = age >= 16 && age <= 100;
+    }
+
+    if (errEl) {
+      errEl.style.display = valid ? 'none' : 'block';
+    }
+    input.classList.toggle('invalid', !valid);
+    return valid;
+  }
+
+  function validateForm(form) {
+    const inputs = form.querySelectorAll('input[required], select[required]');
+    let allValid = true;
+    inputs.forEach(input => {
+      if (!validateField(input)) allValid = false;
+    });
+    return allValid;
+  }
+
+  // === localStorage 暫存 ===
+  function saveToLocal() {
+    const form = document.getElementById('resumeForm');
+    const data = Object.fromEntries(new FormData(form));
+    data._appId = applicationId;
+    try { localStorage.setItem('resume_draft', JSON.stringify(data)); } catch(e) {}
+    showAutosave();
+  }
+
+  function loadFromLocal() {
+    try {
+      const saved = localStorage.getItem('resume_draft');
+      if (!saved) return false;
+      const data = JSON.parse(saved);
+      const form = document.getElementById('resumeForm');
+      for (let key in data) {
+        if (key === '_appId') { applicationId = data[key]; continue; }
+        const input = form.querySelector('[name="' + key + '"]');
+        if (input) input.value = data[key];
+      }
+      return true;
+    } catch(e) { return false; }
+  }
+
+  function clearLocal() {
+    try { localStorage.removeItem('resume_draft'); } catch(e) {}
+  }
+
+  // === 初始化 ===
   window.onload = () => {
-    sig = new SignaturePad(document.getElementById('sig-pad'));
+    const canvas = document.getElementById('sig-pad');
+    sig = new SignaturePad(canvas, {
+      minWidth: 1,
+      maxWidth: 3,
+      penColor: '#1e293b'
+    });
+
+    // 設定生日最大日期為今天
+    document.getElementById('f-birthday').max = new Date().toISOString().split('T')[0];
+
+    // 即時驗證 & 自動儲存
+    const form = document.getElementById('resumeForm');
+    form.querySelectorAll('input, select, textarea').forEach(input => {
+      input.addEventListener('blur', () => validateField(input));
+      input.addEventListener('input', debounce(saveToLocal, 1500));
+    });
+
+    // 恢復暫存資料
+    if (loadFromLocal()) {
+      showAutosave();
+    }
+    if (!applicationId) {
+      applicationId = generateAppId();
+    }
+
     window.addEventListener("resize", resizeCanvas);
   };
+
+  function debounce(fn, delay) {
+    let timer;
+    return function() {
+      clearTimeout(timer);
+      timer = setTimeout(fn, delay);
+    };
+  }
 
   function resizeCanvas() {
     const canvas = document.getElementById('sig-pad');
     const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    const data = sig.toData(); // 保留簽名數據
     canvas.width = canvas.offsetWidth * ratio;
     canvas.height = canvas.offsetHeight * ratio;
     canvas.getContext("2d").scale(ratio, ratio);
-    sig.clear();
+    if (data && data.length > 0) {
+      sig.fromData(data); // 還原簽名
+    }
   }
-
-  function showToast(show) { document.getElementById('saveToast').style.display = show ? 'block' : 'none'; }
 
   async function apiFetch(payload) {
-    const response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-    return await response.json();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+    try {
+      const response = await fetch(GAS_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      return await response.json();
+    } catch(err) {
+      clearTimeout(timeout);
+      if (err.name === 'AbortError') throw new Error('請求逾時，請檢查網路連線');
+      throw err;
+    }
   }
 
+  // === STEP 1: 提交履歷 ===
   async function submitStep1() {
     const form = document.getElementById('resumeForm');
-    if(!form.reportValidity()) return;
+    if (!validateForm(form)) {
+      const firstInvalid = form.querySelector('.invalid');
+      if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    const btn = document.getElementById('btnStep1');
+    setButtonLoading(btn, true, '提交中...');
+
     const data = Object.fromEntries(new FormData(form));
+    // XSS 防護：對所有值做清理
+    for (let key in data) { data[key] = data[key].trim(); }
     applicantName = data.name;
-    showStep(2);
-    document.getElementById('editBtn').style.display = 'block';
-    setTimeout(resizeCanvas, 150); 
-    showToast(true);
-    fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'submitResume', resumeData: JSON.stringify(data) }) }).then(() => showToast(false));
+    data.applicationId = applicationId;
+
+    try {
+      await apiFetch({ action: 'submitResume', resumeData: JSON.stringify(data) });
+      showStep(2);
+      document.getElementById('editBtn').style.display = 'block';
+      setTimeout(resizeCanvas, 200);
+    } catch(err) {
+      alert('提交失敗：' + err.message + '\n請稍後重試');
+    } finally {
+      setButtonLoading(btn, false, '下一步：簽署文件');
+    }
   }
 
+  // === 修改履歷 ===
   function openEditModal() {
     const originalForm = document.getElementById('resumeForm');
     const editForm = document.getElementById('editForm');
     editForm.innerHTML = originalForm.innerHTML;
     const inputs = originalForm.querySelectorAll('input, select, textarea');
     inputs.forEach(input => {
-      const editInput = editForm.querySelector(`[name="${input.name}"]`);
-      if(editInput) editInput.value = input.value;
+      const editInput = editForm.querySelector('[name="' + input.name + '"]');
+      if (editInput) editInput.value = input.value;
     });
     document.getElementById('editModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
   }
 
   async function saveEditedResume() {
     const editForm = document.getElementById('editForm');
-    if(!editForm.reportValidity()) return;
     const data = Object.fromEntries(new FormData(editForm));
+    for (let key in data) { data[key] = data[key].trim(); }
+
     const originalForm = document.getElementById('resumeForm');
-    for(let key in data) {
-      const input = originalForm.querySelector(`[name="${key}"]`);
-      if(input) input.value = data[key];
+    for (let key in data) {
+      const input = originalForm.querySelector('[name="' + key + '"]');
+      if (input) input.value = data[key];
     }
     applicantName = data.name;
+    data.applicationId = applicationId;
+    closeModal();
+    showToast('正在更新履歷...');
+    try {
+      await apiFetch({ action: 'updateResume', resumeData: JSON.stringify(data) });
+      saveToLocal();
+    } catch(err) {
+      alert('更新失敗：' + err.message);
+    } finally {
+      hideToast();
+    }
+  }
+
+  function closeModal() {
     document.getElementById('editModal').style.display = 'none';
-    showToast(true);
-    await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateResume', resumeData: JSON.stringify(data) }) });
-    showToast(false);
+    document.body.style.overflow = '';
   }
 
-  function closeModal() { document.getElementById('editModal').style.display = 'none'; }
-
+  // === STEP 2: 簽署同意書 ===
   async function submitStep2() {
-    if(sig.isEmpty()) return alert("請完成簽名");
-    showStep(3);
-    const res = await (await fetch(GAS_URL + "?action=getQuestions")).json();
-    document.getElementById('examContainer').innerHTML = res.data.map((q, idx) => `
-      <div class="q-card"><p>Q${idx+1}. ${q.question}</p>
-        ${q.options.map((opt, i) => !opt ? '' : `<label class="opt-label"><input type="radio" name="q${q.id}" value="${i+1}" required><span class="opt-text">${i+1}. ${opt}</span></label>`).join('')}
-      </div>`).join('');
-    showToast(true);
-    fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'submitConsent', userName: applicantName, signatureData: sig.toDataURL() }) }).then(() => showToast(false));
+    const consentCheck = document.getElementById('consentCheck');
+    if (!consentCheck.checked) {
+      alert("請先勾選同意個人資料蒐集同意書");
+      return;
+    }
+    if (sig.isEmpty()) {
+      alert("請完成親筆簽名");
+      return;
+    }
+
+    const btn = document.getElementById('btnStep2');
+    setButtonLoading(btn, true, '載入測驗中...');
+
+    try {
+      // 並行：送出同意書 + 取得題目
+      const [, questionsRes] = await Promise.all([
+        apiFetch({ action: 'submitConsent', userName: applicantName, applicationId: applicationId, signatureData: sig.toDataURL() }),
+        fetch(GAS_URL + "?action=getQuestions").then(r => r.json())
+      ]);
+
+      if (!questionsRes.success || !questionsRes.data || questionsRes.data.length === 0) {
+        throw new Error('無法載入測驗題目');
+      }
+
+      document.getElementById('examContainer').innerHTML = questionsRes.data.map((q, idx) =>
+        '<div class="q-card" id="qcard-' + q.id + '"><p>Q' + (idx+1) + '. ' + escapeHtml(q.question) + '</p>' +
+        q.options.map((opt, i) => !opt ? '' :
+          '<label class="opt-label"><input type="radio" name="q' + escapeHtml(q.id) + '" value="' + (i+1) + '" required>' +
+          '<span class="opt-text">' + (i+1) + '. ' + escapeHtml(opt) + '</span></label>'
+        ).join('') + '</div>'
+      ).join('');
+
+      showStep(3);
+    } catch(err) {
+      alert('載入失敗：' + err.message + '\n請稍後重試');
+    } finally {
+      setButtonLoading(btn, false, '確認簽署並開始測驗');
+    }
   }
 
+  // === STEP 3: 提交測驗 ===
   async function handleFinalSubmit() {
     const btn = document.getElementById('submitBtn');
+    const allQuestions = document.querySelectorAll('.q-card');
     const radios = document.querySelectorAll('#examContainer input:checked');
-    if(radios.length === 0) return alert("請回答所有題目");
-    btn.disabled = true; btn.innerText = "結算中...";
+    const errEl = document.getElementById('examError');
+
+    // 檢查是否所有題目都已作答
+    let unanswered = 0;
+    allQuestions.forEach(card => {
+      const qName = card.querySelector('input[type="radio"]');
+      if (qName) {
+        const name = qName.name;
+        const answered = document.querySelector('input[name="' + name + '"]:checked');
+        if (!answered) {
+          card.classList.add('unanswered');
+          unanswered++;
+        } else {
+          card.classList.remove('unanswered');
+        }
+      }
+    });
+
+    if (unanswered > 0) {
+      errEl.textContent = '您有 ' + unanswered + ' 題尚未作答，請完成所有題目';
+      errEl.style.display = 'block';
+      const firstUnanswered = document.querySelector('.q-card.unanswered');
+      if (firstUnanswered) firstUnanswered.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    errEl.style.display = 'none';
+
+    setButtonLoading(btn, true, '結算中...');
     const answers = {};
     radios.forEach(r => answers[r.name.replace('q','')] = r.value);
-    const finalRes = await apiFetch({ action: 'submitAnswers', userName: applicantName, answers: JSON.stringify(answers) });
-    document.getElementById('scoreDisplay').innerText = finalRes.score;
-    document.getElementById('editBtn').style.display = 'none';
-    showStep(4);
+
+    try {
+      const finalRes = await apiFetch({ action: 'submitAnswers', userName: applicantName, applicationId: applicationId, answers: JSON.stringify(answers) });
+      if (!finalRes.success) throw new Error(finalRes.message || '提交失敗');
+
+      document.getElementById('scoreDisplay').innerText = finalRes.score;
+      document.getElementById('trackingCode').textContent = applicationId;
+      document.getElementById('editBtn').style.display = 'none';
+      clearLocal(); // 清除暫存
+      showStep(4);
+    } catch(err) {
+      alert('提交失敗：' + err.message + '\n請稍後重試');
+      setButtonLoading(btn, false, '提交所有應徵資料');
+    }
   }
 
   function showStep(n) {
     document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.step-idx').forEach((s, i) => s.classList.toggle('active', i+1 === n));
-    document.getElementById('step'+n).classList.add('active');
-    window.scrollTo(0,0);
+    document.querySelectorAll('.step-idx').forEach((s, i) => {
+      s.classList.remove('active');
+      s.setAttribute('aria-selected', 'false');
+      if (i + 1 < n) s.classList.add('completed');
+    });
+    const stepEl = document.getElementById('s' + n);
+    stepEl.classList.add('active');
+    stepEl.setAttribute('aria-selected', 'true');
+    document.getElementById('step' + n).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 </script>
 </body>
